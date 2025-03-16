@@ -1,2 +1,2 @@
-gang
-!
+    Chatty is a modern microblogging-style social media application created to offer users an authentic online communication experience and free expression of thoughts. Users can create posts, chat with each other, customize their profile and more.
+    The website was created using React, Node.js, Express.js and Redux.js for the backend and frontend, Tailwind CSS for the design and MongoDB for the database.
