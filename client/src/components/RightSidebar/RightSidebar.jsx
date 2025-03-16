@@ -2,12 +2,25 @@ import React from "react";
 
 const RightSidebar = () => {
   return (
-    <div className="p-6 bg-slate-100 rounded-lg mx-4 space-y-4">
-      <h2 className="font-medium">Trending</h2>
-      <p className="font-bold">#gryffindor</p>
-      <p className="font-bold">#hufflepuff</p>
-      <p className="font-bold">#slytherin</p>
-      <p className="font-bold">#ravenclaw</p>
+    <div className="p-6 bg-orange-50 border border-orange-300 rounded-lg shadow-md mx-4 space-y-4">
+      {/* Trending Title */}
+      <h2 className="text-xl font-bold text-orange-500">Trending</h2>
+
+      {/* Trending Topics */}
+      <div className="space-y-3">
+        <p className="font-semibold text-gray-700 hover:text-orange-600 cursor-pointer transition">
+          #music
+        </p>
+        <p className="font-semibold text-gray-700 hover:text-orange-600 cursor-pointer transition">
+          #movies
+        </p>
+        <p className="font-semibold text-gray-700 hover:text-orange-600 cursor-pointer transition">
+          #politics
+        </p>
+        <p className="font-semibold text-gray-700 hover:text-orange-600 cursor-pointer transition">
+          #romania
+        </p>
+      </div>
     </div>
   );
 };

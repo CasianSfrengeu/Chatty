@@ -1,5 +1,9 @@
+// this component defines the backend API routes for managing tweets (creating, deleting, liking/disliking), fetching tweets and exploring tweets
+
 import express from "express";
 import { verifyToken } from "../verifyToken.js";
+
+// importing the tweet controller functions
 import {
   createTweet,
   deleteTweet,
@@ -9,21 +13,21 @@ import {
   getExploreTweets,
 } from "../controllers/tweet.js";
 
+// creating a new router instance
 const router = express.Router();
 
-// Create a Tweet
+// verifying token before allowing the user to create or delete a tweet
+// if token is verified, we call the functions from the controller
 router.post("/", verifyToken, createTweet);
-
-// Delete a Tweet
 router.delete("/:id", verifyToken, deleteTweet);
 
-// Like or Dislike a Tweet
+// liking or disliking posts
 router.put("/:id/like", likeOrDislike);
 
-// get all timeline tweets
+// get the timeline posts
 router.get("/timeline/:id", getAllTweets);
 
-// get user Tweets only
+// gets only one specific user's posts
 router.get("/user/all/:id", getUserTweets);
 
 //explore

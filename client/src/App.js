@@ -8,6 +8,8 @@ import Signin from "./pages/Signin/Signin";
 import Navbar from "./components/Navbar/Navbar";
 import Error from "./pages/Error/Error";
 
+// wrapping the pages with a consistent layout
+// navbar followed by the main content
 const Layout = () => {
   return (
     <div className="md:w-8/12 mx-auto">
@@ -17,31 +19,33 @@ const Layout = () => {
   );
 };
 
+
+// app router configuration
 const router = createBrowserRouter([
   {
     path: "/",
-    errorElement: <Error />,
-    element: <Layout />,
+    errorElement: <Error />, // for invalid routes
+    element: <Layout />, // main layout with navbar
     children: [
       {
         path: "/",
-        element: <Home />,
+        element: <Home />, // home page
       },
       {
         path: "/profile/:id",
-        element: <Profile />,
+        element: <Profile />, // user profile
       },
       {
         path: "/explore",
-        element: <Explore />,
+        element: <Explore />, // explore page
       },
       {
         path: "/signin",
-        element: <Signin />,
+        element: <Signin />, // signin page
       },
       {
         path: "/signout",
-        element: <Signin />,
+        element: <Signin />, // signout redirects to signin page
       },
     ],
   },

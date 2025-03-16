@@ -1,43 +1,20 @@
 import React, { useState } from "react";
-import StarBorderPurple500Icon from "@mui/icons-material/StarBorderPurple500";
 import SearchIcon from "@mui/icons-material/Search";
 
-import { useLocation } from "react-router-dom";
-import UserPlaceholder from "../UserPlaceholder/UserPlaceholder";
-
 const Navbar = () => {
-  const [userData, setUserData] = useState(null);
-  const location = useLocation().pathname;
-
   return (
-    <div className="grid grid-cols-1 md:grid-cols-4 my-5 justify-center">
-      <div className="mx-auto md:mx-0">
-        <img
-          src="/twitter-logo.png"
-          alt="Twitter Logo"
-          width={"40px"}
-          className="ml-8"
+    <div className="w-full h-[60px] fixed top-0 left-0 bg-white shadow-md flex items-center justify-between px-6 z-50">
+      {/* App Name */}
+      <h1 className="text-2xl font-extrabold text-orange-500">Chatty</h1>
+
+      {/* Search Bar */}
+      <div className="relative w-[250px] md:w-[300px]">
+        <SearchIcon className="absolute left-3 top-2 text-gray-500" />
+        <input
+          type="text"
+          placeholder="Search..."
+          className="w-full bg-orange-50 border border-orange-300 text-gray-800 rounded-full py-2 pl-10 pr-4 focus:ring-2 focus:ring-orange-500 focus:outline-none"
         />
-      </div>
-
-      <div className="col-span-2 md:border-x-2 md:border-slate-200 md:px-6 my-6 md:my-0">
-        <div className="flex justify-between items-center">
-          <h2 className="font-bold text-2xl">
-            {location.includes("profile") ? (
-              <UserPlaceholder setUserData={setUserData} userData={userData} />
-            ) : location.includes("explore") ? (
-              "Explore"
-            ) : (
-              "Home"
-            )}
-          </h2>
-          <StarBorderPurple500Icon />
-        </div>
-      </div>
-
-      <div className="px-0 md:px-6 mx-auto">
-        <SearchIcon className="absolute m-2" />
-        <input type="text" className="bg-blue-100 rounded-full py-2 px-8" />
       </div>
     </div>
   );
