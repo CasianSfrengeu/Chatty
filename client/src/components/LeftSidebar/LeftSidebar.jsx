@@ -5,6 +5,8 @@ import HomeIcon from "@mui/icons-material/Home";
 import TagIcon from "@mui/icons-material/Tag";
 import PersonIcon from "@mui/icons-material/Person";
 import LogoutIcon from "@mui/icons-material/Logout";
+import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutline";
+
 
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../../redux/userSlice";
@@ -40,6 +42,14 @@ const LeftSidebar = () => {
             <p className="text-gray-700 font-medium">Explore</p>
           </div>
         </Link>
+
+        <Link to="/chat">
+          <div className="flex items-center space-x-4 px-4 py-3 rounded-full cursor-pointer hover:bg-orange-100 transition">
+            <ChatBubbleOutlineIcon className="text-orange-500" fontSize="large" />
+            <p className="text-gray-700 font-medium">Chat</p>
+          </div>
+        </Link>
+
       </div>
 
       {/* User Info + Profile & Logout Buttons */}

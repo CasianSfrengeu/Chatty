@@ -7,6 +7,7 @@ import Explore from "./pages/Explore/Explore";
 import Signin from "./pages/Signin/Signin";
 import Navbar from "./components/Navbar/Navbar";
 import Error from "./pages/Error/Error";
+import Chat from "./pages/Chat/Chat";
 
 // wrapping the pages with a consistent layout
 // navbar followed by the main content
@@ -46,6 +47,10 @@ const router = createBrowserRouter([
       {
         path: "/signout",
         element: <Signin />, // signout redirects to signin page
+      },
+      {
+        path: "/chat",
+        element: <Chat />,
       },
     ],
   },

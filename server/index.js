@@ -1,49 +1,84 @@
-// using the express node.js framework 
+// Framework Express
 import express from "express";
 
+// Librării externe
 import dotenv from "dotenv";
 import mongoose from "mongoose";
 import cookieParser from "cookie-parser";
 
+// Rute definite
 import userRoutes from "./routes/users.js";
 import authRoutes from "./routes/auths.js";
 import tweetRoutes from "./routes/tweets.js";
+import conversationRoutes from "./routes/conversations.js";
+import messageRoutes from "./routes/messages.js";
 
-// initializing the express app
+// Server HTTP și socket.io
+import http from "http";
+import { Server } from "socket.io";
+
+// Inițializare aplicație Express
 const app = express();
-// lading the .env file variables (MONGO URI) into process.env
 dotenv.config();
 
-// DB connection function
+// Conectare la MongoDB
 const connect = () => {
-  mongoose.set("strictQuery", false); // preventing deprevated query warning
-  mongoose 
-  // using mongoose.connect to connect to the MongoDB
+  mongoose.set("strictQuery", false);
+  mongoose
     .connect(process.env.MONGO)
     .then(() => {
-      // console message if the connection is successful
-      console.log("connect to mongodb database");
+      console.log("✅ Connected to MongoDB database");
     })
-    // if the connection fails we throw an error
     .catch((err) => {
       throw err;
     });
 };
 
-// setup for the middleware
-// cookie parser for authentication
+// Middleware-uri
 app.use(cookieParser());
-// express.json parses incoming json data
 app.use(express.json());
 
-// setting up the API routes
+// Rute API
 app.use("/api/users", userRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/tweets", tweetRoutes);
+app.use("/api/conversations", conversationRoutes);
+app.use("/api/messages", messageRoutes);
 
-// starting the server on port 8000
-app.listen(8000, () => {
-  // calling the connect function
+// Server HTTP separat pentru Express + Socket.io
+const server = http.createServer(app);
+
+// Inițializare Socket.io
+const io = new Server(server, {
+  cors: {
+    origin: "http://localhost:3000", // adresa frontendului
+    credentials: true,
+  },
+});
+
+// Socket.io events
+io.on("connection", (socket) => {
+  console.log("🔌 Socket connected:", socket.id);
+
+  // Mesaj trimis
+  socket.on("sendMessage", ({ senderId, receiverId, text, conversationId }) => {
+    io.emit("receiveMessage", {
+      senderId,
+      receiverId,
+      text,
+      conversationId,
+      createdAt: new Date(),
+    });
+  });
+
+  // Deconectare
+  socket.on("disconnect", () => {
+    console.log("❌ Socket disconnected:", socket.id);
+  });
+});
+
+// Pornire server
+server.listen(8000, () => {
   connect();
-  console.log("Listening to port 8000");
+  console.log("🚀 Server running on port 8000");
 });

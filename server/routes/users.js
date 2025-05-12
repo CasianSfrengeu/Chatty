@@ -6,6 +6,7 @@ import multer from "multer";
 import path from "path";
 import { getUser, update, deleteUser, follow, unFollow } from "../controllers/user.js";
 import { verifyToken } from "../verifyToken.js";
+import { getUserByUsername } from "../controllers/user.js";
 
 const router = express.Router();
 
@@ -49,5 +50,6 @@ router.get("/find/:id", getUser);
 router.delete("/:id", verifyToken, deleteUser);
 router.put("/follow/:id", verifyToken, follow);
 router.put("/unfollow/:id", verifyToken, unFollow);
+router.get("/username/:username", getUserByUsername);
 
 export default router;
