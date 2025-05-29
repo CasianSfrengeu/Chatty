@@ -10,21 +10,20 @@ import { useSelector } from "react-redux";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 
+// 🔽 Comentarii
+import CommentList from "../CommentList";
+import AddComment from "../AddComment";
 
 const Tweet = ({ tweet, setData }) => {
-  // getting the current user from Redux
   const { currentUser } = useSelector((state) => state.user);
-  // storing the tweet author's data
   const [userData, setUserData] = useState();
+  const [refreshComments, setRefreshComments] = useState(false);
 
-  // formatting the post's creation date
   const dateStr = formatDistance(new Date(tweet.createdAt), new Date());
-  // getting the current page's location
   const location = useLocation().pathname;
-  // getting the user ID from URL parameters
   const { id } = useParams();
 
-  // fetching the tweet author's data based on the tweet's user id
+  // Fetch autor tweet
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -36,19 +35,17 @@ const Tweet = ({ tweet, setData }) => {
     };
 
     fetchData();
-  }, [tweet.userId, tweet.likes]); // runs when tweet.userId or tweet.likes changes
+  }, [tweet.userId, tweet.likes]);
 
-
-  //  function for liking and unliking posts
+  // Like/Unlike
   const handleLike = async (e) => {
     e.preventDefault();
 
     try {
-      // sending a PUT request to like/unlike the tweet
       await axios.put(`/tweets/${tweet._id}/like`, {
         id: currentUser._id,
       });
-      // getting the tweets based on the page location  to update the interface
+
       if (location.includes("profile")) {
         const newData = await axios.get(`/tweets/user/all/${id}`);
         setData(newData.data);
@@ -89,6 +86,16 @@ const Tweet = ({ tweet, setData }) => {
             )}
             <span>{tweet.likes.length}</span>
           </button>
+
+          {/* 🔽 Comentarii */}
+          <div className="mt-4 border-t border-orange-200 pt-4 space-y-3">
+            <h4 className="text-orange-500 font-semibold text-sm">Comentarii</h4>
+            <AddComment
+              postId={tweet._id}
+              onCommentAdded={() => setRefreshComments((prev) => !prev)}
+            />
+            <CommentList postId={tweet._id} key={refreshComments} />
+          </div>
         </>
       )}
     </div>

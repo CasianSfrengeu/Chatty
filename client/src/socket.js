@@ -1,5 +1,6 @@
+
 import { io } from "socket.io-client";
 
-const socket = io("http://localhost:8000"); // trebuie să fie același cu serverul
+const socket = io("http://localhost:8000");
 
 export default socket;

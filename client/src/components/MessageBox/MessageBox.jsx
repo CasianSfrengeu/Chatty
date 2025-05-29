@@ -1,21 +1,66 @@
 import React, { useEffect, useState, useRef } from "react";
 import axios from "axios";
+import { useSelector } from "react-redux";
+import { io } from "socket.io-client";
 import formatDistance from "date-fns/formatDistance";
 
-const MessageBox = ({ conversation, currentUser }) => {
+const socket = io("http://localhost:8000");
+
+const MessageBox = ({ conversation }) => {
+  const { currentUser } = useSelector((state) => state.user);
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
   const [receiverUsername, setReceiverUsername] = useState("");
+  const [typingStatus, setTypingStatus] = useState(null);
   const scrollRef = useRef(null);
 
   const otherUserId = conversation?.members?.find(
     (id) => id !== currentUser._id
   );
 
-  // ✅ Fetch messages when conversation is selected
+  // 🔌 Conectare socket
+  useEffect(() => {
+    socket.emit("addUser", currentUser._id);
+  }, [currentUser]);
+
+  // 📩 Mesaj primit
+  useEffect(() => {
+    const handleReceive = (data) => {
+      if (data.conversationId === conversation?._id) {
+        setMessages((prev) => {
+          const exists = prev.some(
+            (m) =>
+              m.text === data.text &&
+              m.sender === data.sender &&
+              new Date(m.createdAt).getTime() === new Date(data.createdAt).getTime()
+          );
+          return exists ? prev : [...prev, data];
+        });
+      }
+    };
+
+    socket.on("receiveMessage", handleReceive);
+    return () => socket.off("receiveMessage", handleReceive);
+  }, [conversation]);
+
+  // 🟠 Tastează
+  useEffect(() => {
+    socket.on("typing", ({ senderName, conversationId }) => {
+      if (conversationId === conversation?._id) {
+        setTypingStatus(`${senderName} tastează...`);
+
+        // Șterge indicatorul după 2 secunde
+        const timeout = setTimeout(() => setTypingStatus(null), 2000);
+        return () => clearTimeout(timeout);
+      }
+    });
+
+    return () => socket.off("typing");
+  }, [conversation]);
+
+  // 📥 Fetch mesaje
   useEffect(() => {
     if (!conversation?._id) return;
-
     const fetchMessages = async () => {
       try {
         const res = await axios.get(`/messages/${conversation._id}`);
@@ -24,14 +69,12 @@ const MessageBox = ({ conversation, currentUser }) => {
         console.log("Eroare la fetch messages:", err);
       }
     };
-
     fetchMessages();
   }, [conversation]);
 
-  // ✅ Fetch other user data
+  // 📛 Username partener
   useEffect(() => {
     if (!otherUserId) return;
-
     const fetchUser = async () => {
       try {
         const res = await axios.get(`/users/find/${otherUserId}`);
@@ -40,15 +83,15 @@ const MessageBox = ({ conversation, currentUser }) => {
         console.log("Eroare la fetch user:", err);
       }
     };
-
     fetchUser();
   }, [otherUserId]);
 
-  // ✅ Scroll to latest message
+  // 🔽 Scroll
   useEffect(() => {
     scrollRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
+  // ✉️ Trimitere mesaj
   const handleSend = async (e) => {
     e.preventDefault();
     if (!newMessage.trim()) return;
@@ -57,18 +100,33 @@ const MessageBox = ({ conversation, currentUser }) => {
       sender: currentUser._id,
       text: newMessage,
       conversationId: conversation._id,
+      createdAt: new Date().toISOString(),
     };
 
     try {
-      const res = await axios.post("/messages", message);
-      setMessages((prev) => [...prev, res.data]);
+      setMessages((prev) => [...prev, message]);
       setNewMessage("");
+
+      await axios.post("/messages", message);
+
+      socket.emit("sendMessage", {
+        ...message,
+        receiverId: otherUserId,
+      });
     } catch (err) {
-      console.log("Eroare la trimitere:", err);
+      console.log("Eroare la trimitere mesaj:", err);
     }
   };
 
-  // ✅ Fallback dacă conversația nu este selectată
+  // 📤 Emitere typing la input
+  const handleTyping = () => {
+    socket.emit("typing", {
+      senderName: currentUser.username,
+      conversationId: conversation._id,
+      receiverId: otherUserId,
+    });
+  };
+
   if (!conversation) {
     return (
       <div className="flex items-center justify-center h-full text-gray-500">
@@ -79,18 +137,16 @@ const MessageBox = ({ conversation, currentUser }) => {
 
   return (
     <div className="flex flex-col h-full">
-      {/* Header */}
       <div className="pb-4 border-b border-orange-300 mb-2">
         <h3 className="text-xl font-semibold text-orange-500">
           Chat cu: {receiverUsername || "Utilizator"}
         </h3>
       </div>
 
-      {/* Mesaje */}
       <div className="flex-1 overflow-y-auto space-y-3 px-2 bg-orange-50">
-        {messages.map((msg) => (
+        {messages.map((msg, index) => (
           <div
-            key={msg._id}
+            key={index}
             ref={scrollRef}
             className={`max-w-[70%] p-3 rounded-xl text-sm shadow ${
               msg.sender === currentUser._id
@@ -106,9 +162,13 @@ const MessageBox = ({ conversation, currentUser }) => {
             </span>
           </div>
         ))}
+
+        {/* ➕ Indicator tastează */}
+        {typingStatus && (
+          <div className="text-sm text-gray-400 italic">{typingStatus}</div>
+        )}
       </div>
 
-      {/* Input */}
       <form
         onSubmit={handleSend}
         className="flex mt-4 border-t border-orange-300 pt-2 px-2"
@@ -117,7 +177,10 @@ const MessageBox = ({ conversation, currentUser }) => {
           type="text"
           placeholder="Scrie un mesaj..."
           value={newMessage}
-          onChange={(e) => setNewMessage(e.target.value)}
+          onChange={(e) => {
+            setNewMessage(e.target.value);
+            handleTyping();
+          }}
           className="flex-1 px-4 py-2 border border-orange-300 rounded-l-full focus:outline-none"
         />
         <button
