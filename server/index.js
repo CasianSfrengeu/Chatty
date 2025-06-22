@@ -114,6 +114,7 @@ io.on("connection", (socket) => {
 
 // Servire fișiere statice din React în producție
 if (process.env.NODE_ENV === "production") {
+  console.log("🔧 Production mode: serving static files from client/build");
   const clientBuildPath = path.join(__dirname, "../client/build");
   app.use(express.static(clientBuildPath));
 
