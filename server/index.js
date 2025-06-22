@@ -136,9 +136,15 @@ if (process.env.NODE_ENV === "production") {
   }
   
   if (clientBuildPath) {
+    // Serve static files from React build
     app.use(express.static(clientBuildPath));
     
-    app.get("*", (req, res) => {
+    // Catch-all route for client-side routing (only for non-API routes)
+    app.get("*", (req, res, next) => {
+      // Skip API routes
+      if (req.path.startsWith('/api/')) {
+        return next();
+      }
       res.sendFile(path.join(clientBuildPath, "index.html"));
     });
   } else {

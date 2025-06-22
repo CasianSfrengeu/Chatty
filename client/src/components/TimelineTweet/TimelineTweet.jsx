@@ -1,7 +1,7 @@
 // this component makes sure the user's feed is updated dynamically
 
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import api from "../../api";
 
 import { useSelector } from "react-redux";
 import Tweet from "../Tweet/Tweet";
@@ -15,24 +15,40 @@ const TimelineTweet = () => {
 
   useEffect(() => {
     const fetchData = async () => {
+      // Don't fetch if no current user
+      if (!currentUser?._id) {
+        setTimeLine([]);
+        return;
+      }
+
       try {
         // this is the API request to get the timeline tweets
-        const timelineTweets = await axios.get(
+        const timelineTweets = await api.get(
           `/tweets/timeline/${currentUser._id}`
         );
         // storing the fetched posts in state
         setTimeLine(timelineTweets.data);
       } catch (err) {
         console.log("error", err);
+        setTimeLine([]); // Set empty array on error
       }
     };
 
     fetchData();
-  }, [currentUser._id]);
+  }, [currentUser?._id]);
+
+  // Don't render if no current user
+  if (!currentUser) {
+    return (
+      <div className="mt-6 text-center text-gray-500">
+        Please sign in to see your timeline
+      </div>
+    );
+  }
 
   return (
     <div className="mt-6 space-y-4">
-      {timeLine &&
+      {timeLine && Array.isArray(timeLine) && timeLine.length > 0 ? (
         timeLine.map((tweet) => (
           <div
             key={tweet._id}
@@ -40,7 +56,12 @@ const TimelineTweet = () => {
           >
             <Tweet tweet={tweet} setData={setTimeLine} />
           </div>
-        ))}
+        ))
+      ) : (
+        <div className="text-center text-gray-500 py-8">
+          No tweets to show. Start posting!
+        </div>
+      )}
     </div>
   );
 };
