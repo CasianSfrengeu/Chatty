@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import api from "../../api";
 import { useDispatch, useSelector } from "react-redux";
 import { changeProfile, logout } from "../../redux/userSlice";
 import { useNavigate } from "react-router-dom";
@@ -25,7 +25,7 @@ const EditProfile = ({ setOpen }) => {
       formData.append("image", file);
 
       // PUT request to update the profile picture
-      const res = await axios.put(`/users/${currentUser._id}/profile`, formData, {
+      const res = await api.put(`/users/${currentUser._id}/profile`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
@@ -42,7 +42,7 @@ const EditProfile = ({ setOpen }) => {
   const handleDelete = async () => {
     try {
       // using a DELETE request to remove the user's account from the DB
-      await axios.delete(`/users/${currentUser._id}`);
+      await api.delete(`/users/${currentUser._id}`);
       // dispatching the logout action
       dispatch(logout());
       // if the request is successful the user gets redirected to the signin page

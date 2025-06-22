@@ -1,49 +1,76 @@
 // src/components/Conversations/Conversations.jsx
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import api from "../../api";
+import ConversationList from "../ConversationList/ConversationList";
+import MessageBox from "../MessageBox/MessageBox";
+import NewConversation from "../NewConversation/NewConversation";
+import { useSelector } from "react-redux";
 
-const Conversations = ({ currentUserId, setSelectedConversation, refresh }) => {
+const Conversations = () => {
+  const [selectedConversation, setSelectedConversation] = useState(null);
   const [conversations, setConversations] = useState([]);
+  const { currentUser } = useSelector((state) => state.user);
 
   useEffect(() => {
     const fetchConversations = async () => {
       try {
-        const res = await axios.get(`/conversations/${currentUserId}`, {
-          withCredentials: true,
-        });
-  
-        // Optional: Fetch username-ul celuilalt user
-        const withNames = await Promise.all(
-          res.data.map(async (conv) => {
-            const otherUserId = conv.members.find((id) => id !== currentUserId);
-            const userRes = await axios.get(`/users/find/${otherUserId}`);
-            return { ...conv, otherUsername: userRes.data.username };
-          })
-        );
-  
-        setConversations(withNames);
+        const res = await api.get(`/conversations/${currentUser._id}`);
+        setConversations(Array.isArray(res.data) ? res.data : []);
       } catch (err) {
-        console.error("Eroare la aducerea conversațiilor", err);
+        console.log("Eroare la aducerea conversațiilor", err);
+        setConversations([]);
       }
     };
-  
+
+    if (currentUser?._id) {
+      fetchConversations();
+    }
+  }, [currentUser?._id]);
+
+  const handleConversationCreated = () => {
+    // Refresh conversations list
+    const fetchConversations = async () => {
+      try {
+        const res = await api.get(`/conversations/${currentUser._id}`);
+        setConversations(Array.isArray(res.data) ? res.data : []);
+      } catch (err) {
+        console.log("Eroare la aducerea conversațiilor", err);
+      }
+    };
     fetchConversations();
-  }, [currentUserId, refresh]); // 👈 AICI TREBUIE să fie și refresh!
-  
+  };
 
   return (
-    <div className="p-4 space-y-2">
-      <h2 className="text-xl font-bold text-orange-500 mb-4">Conversații</h2>
-          {conversations.map((conv) => (
-            <div
-              key={conv._id}
-              onClick={() => setSelectedConversation(conv)}
-              className="p-3 bg-white rounded-lg shadow cursor-pointer hover:bg-orange-100 transition"
-            >
-              {conv.otherUsername || "Conversație"}
-            </div>
-    ))}
+    <div className="flex h-screen bg-orange-50">
+      {/* Left Sidebar - Conversations List */}
+      <div className="w-1/3 bg-white border-r border-orange-200">
+        <div className="p-4 border-b border-orange-200">
+          <h2 className="text-xl font-bold text-orange-600">Conversations</h2>
+        </div>
+        
+        <ConversationList
+          currentUserId={currentUser?._id}
+          setSelectedConversation={setSelectedConversation}
+        />
+        
+        <div className="p-4 border-t border-orange-200">
+          <NewConversation
+            currentUserId={currentUser?._id}
+            onConversationCreated={handleConversationCreated}
+          />
+        </div>
+      </div>
 
+      {/* Right Side - Messages */}
+      <div className="flex-1">
+        {selectedConversation ? (
+          <MessageBox conversation={selectedConversation} />
+        ) : (
+          <div className="flex items-center justify-center h-full text-gray-500">
+            Select a conversation to start messaging
+          </div>
+        )}
+      </div>
     </div>
   );
 };

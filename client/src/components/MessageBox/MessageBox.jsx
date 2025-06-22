@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
-import axios from "axios";
+import api from "../../api";
 import { useSelector } from "react-redux";
 import { io } from "socket.io-client";
 import formatDistance from "date-fns/formatDistance";
@@ -63,10 +63,11 @@ const MessageBox = ({ conversation }) => {
     if (!conversation?._id) return;
     const fetchMessages = async () => {
       try {
-        const res = await axios.get(`/messages/${conversation._id}`);
-        setMessages(res.data);
+        const res = await api.get(`/messages/${conversation._id}`);
+        setMessages(Array.isArray(res.data) ? res.data : []);
       } catch (err) {
         console.log("Eroare la fetch messages:", err);
+        setMessages([]);
       }
     };
     fetchMessages();
@@ -77,10 +78,11 @@ const MessageBox = ({ conversation }) => {
     if (!otherUserId) return;
     const fetchUser = async () => {
       try {
-        const res = await axios.get(`/users/find/${otherUserId}`);
-        setReceiverUsername(res.data.username);
+        const res = await api.get(`/users/find/${otherUserId}`);
+        setReceiverUsername(res.data?.username || "Utilizator");
       } catch (err) {
         console.log("Eroare la fetch user:", err);
+        setReceiverUsername("Utilizator");
       }
     };
     fetchUser();
@@ -107,7 +109,7 @@ const MessageBox = ({ conversation }) => {
       setMessages((prev) => [...prev, message]);
       setNewMessage("");
 
-      await axios.post("/messages", message);
+      await api.post("/messages", message);
 
       socket.emit("sendMessage", {
         ...message,
@@ -144,7 +146,7 @@ const MessageBox = ({ conversation }) => {
       </div>
 
       <div className="flex-1 overflow-y-auto space-y-3 px-2 bg-orange-50">
-        {messages.map((msg, index) => (
+        {Array.isArray(messages) && messages.map((msg, index) => (
           <div
             key={index}
             ref={scrollRef}

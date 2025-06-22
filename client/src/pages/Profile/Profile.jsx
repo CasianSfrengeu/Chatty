@@ -5,7 +5,7 @@ import EditProfile from "../../components/EditProfile/EditProfile";
 
 import { useParams } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
-import axios from "axios";
+import api from "../../api";
 import Tweet from "../../components/Tweet/Tweet";
 
 import { following } from "../../redux/userSlice";
@@ -20,7 +20,7 @@ import { following } from "../../redux/userSlice";
 const Profile = () => {
   const [open, setOpen] = useState(false);
   const { currentUser } = useSelector((state) => state.user);
-  const [userTweets, setUserTweets] = useState(null); // storing user's tweets
+  const [userTweets, setUserTweets] = useState([]); // storing user's tweets
   const [userProfile, setUserProfile] = useState(null); // storing user profile information
 
   const { id } = useParams(); // extracting the user id
@@ -30,13 +30,14 @@ const Profile = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const userTweets = await axios.get(`/tweets/user/all/${id}`);
-        const userProfile = await axios.get(`/users/find/${id}`);
+        const userTweets = await api.get(`/tweets/user/all/${id}`);
+        const userProfile = await api.get(`/users/find/${id}`);
 
-        setUserTweets(userTweets.data);
+        setUserTweets(Array.isArray(userTweets.data) ? userTweets.data : []);
         setUserProfile(userProfile.data);
       } catch (err) {
         console.log("error", err);
+        setUserTweets([]);
       }
     };
 
@@ -49,7 +50,7 @@ const Profile = () => {
     if (!currentUser.following.includes(id)) {
       try {
         // PUT request to send a follow request
-        await axios.put(`/users/follow/${id}`, { id: currentUser._id });
+        await api.put(`/users/follow/${id}`, { id: currentUser._id });
         // updating redux store
         dispatch(following(id));
       } catch (err) {
@@ -58,7 +59,7 @@ const Profile = () => {
     } else {
       try {
         // PUT request to send an unfollow request
-        await axios.put(`/users/unfollow/${id}`, { id: currentUser._id });
+        await api.put(`/users/unfollow/${id}`, { id: currentUser._id });
         // updating redux store
         dispatch(following(id));
       } catch (err) {

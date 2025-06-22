@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import api from "../../api";
 import { useSelector } from "react-redux";
 import Tweet from "../Tweet/Tweet";
 
 const ExploreTweets = () => {
 
   // state to store tweets from the backend
-  const [explore, setExplore] = useState(null);
+  const [explore, setExplore] = useState([]);
 
   // fetching current user info from the Redux state
   const { currentUser } = useSelector((state) => state.user);
@@ -15,15 +15,16 @@ const ExploreTweets = () => {
     const fetchData = async () => {
       try {
         // fetching explore tweets
-        const exploreTweets = await axios.get("/tweets/explore");
+        const exploreTweets = await api.get("/tweets/explore");
         // storing the retrieved tweets in state
-        setExplore(exploreTweets.data);
+        setExplore(Array.isArray(exploreTweets.data) ? exploreTweets.data : []);
       } catch (err) {
         console.error("Error fetching explore tweets:", err);
+        setExplore([]);
       }
     };
     fetchData();
-  }, [currentUser._id]);
+  }, [currentUser?._id]);
 
   return (
     <div className="p-6 bg-orange-50 min-h-screen flex flex-col items-center">
@@ -34,7 +35,7 @@ const ExploreTweets = () => {
 
       {/* Tweet Cards: Fixed Width & Proper Wrapping */}
       <div className="flex flex-wrap justify-center gap-6 w-full max-w-5xl">
-        {explore &&
+        {Array.isArray(explore) && explore.length > 0 ? (
           explore.map((tweet) => (
             <div
               key={tweet._id}
@@ -42,15 +43,13 @@ const ExploreTweets = () => {
             >
               <Tweet tweet={tweet} setData={setExplore} />
             </div>
-          ))}
+          ))
+        ) : (
+          <p className="text-gray-500 text-center mt-10">
+            No tweets to explore. Be the first to post something!
+          </p>
+        )}
       </div>
-
-      {/* No Tweets Found */}
-      {!explore && (
-        <p className="text-gray-500 text-center mt-10">
-          No tweets to explore. Be the first to post something!
-        </p>
-      )}
     </div>
   );
 };

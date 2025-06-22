@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import axios from "axios";
+import api from "../../api";
 
 const NewConversation = ({ currentUserId, onConversationCreated }) => {
   const [usernameInput, setUsernameInput] = useState("");
@@ -15,7 +15,7 @@ const NewConversation = ({ currentUserId, onConversationCreated }) => {
 
     try {
       // Pasul 1: Caută userul după username
-      const resUser = await axios.get(`/users/username/${usernameInput}`);
+      const resUser = await api.get(`/users/username/${usernameInput}`);
       const receiver = resUser.data;
 
       if (receiver._id === currentUserId) {
@@ -24,8 +24,9 @@ const NewConversation = ({ currentUserId, onConversationCreated }) => {
       }
 
       // Pasul 2: Verifică dacă există deja o conversație
-      const resConv = await axios.get(`/conversations/${currentUserId}`);
-      const alreadyExists = resConv.data.some((conv) =>
+      const resConv = await api.get(`/conversations/${currentUserId}`);
+      const conversations = Array.isArray(resConv.data) ? resConv.data : [];
+      const alreadyExists = conversations.some((conv) =>
         conv.members.includes(receiver._id)
       );
 
@@ -35,7 +36,7 @@ const NewConversation = ({ currentUserId, onConversationCreated }) => {
       }
 
       // ✅ Pasul 3: Creează conversația
-      await axios.post("/conversations", {
+      await api.post("/conversations", {
         senderId: currentUserId,
         receiverId: receiver._id,
       });
@@ -53,26 +54,28 @@ const NewConversation = ({ currentUserId, onConversationCreated }) => {
   };
 
   return (
-    <div className="p-4 bg-orange-50 rounded-lg shadow space-y-4 mt-4">
-      <h3 className="text-lg font-semibold text-orange-500">
-        Începe o conversație nouă
+    <div className="p-4">
+      <h3 className="text-lg font-semibold text-orange-600 mb-3">
+        New Conversation
       </h3>
-      <form onSubmit={handleCreateConversation} className="flex space-x-2">
+      <form onSubmit={handleCreateConversation} className="space-y-3">
         <input
           type="text"
-          placeholder="Username"
+          placeholder="Enter username..."
           value={usernameInput}
           onChange={(e) => setUsernameInput(e.target.value)}
-          className="flex-1 px-3 py-2 border border-orange-300 rounded focus:outline-none"
+          className="w-full p-2 border border-orange-300 rounded focus:outline-none focus:ring-2 focus:ring-orange-500"
         />
         <button
           type="submit"
-          className="bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600 transition"
+          className="w-full bg-orange-500 text-white py-2 rounded hover:bg-orange-600 transition"
         >
-          Creează
+          Start Conversation
         </button>
       </form>
-      {feedback && <p className="text-sm text-gray-600">{feedback}</p>}
+      {feedback && (
+        <p className="mt-2 text-sm text-orange-600">{feedback}</p>
+      )}
     </div>
   );
 };

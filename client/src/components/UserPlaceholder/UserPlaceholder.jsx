@@ -1,6 +1,6 @@
 // This component fetches and displays a user's basic profile info
 
-import axios from "axios";
+import api from "../../api";
 import React, { useState, useEffect } from "react";
 
 import { useLocation, useParams } from "react-router-dom";
@@ -17,7 +17,7 @@ const UserPlaceholder = ({ setUserData, userData }) => {
     const fetchData = async () => {
       try {
         // GET request to get the user's details based on their id
-        const userProfile = await axios.get(`/users/find/${id}`);
+        const userProfile = await api.get(`/users/find/${id}`);
         // updating the user's data state in the parent component
         setUserData(userProfile.data);
       } catch (e) {
