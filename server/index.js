@@ -5,6 +5,8 @@ import express from "express";
 import dotenv from "dotenv";
 import mongoose from "mongoose";
 import cookieParser from "cookie-parser";
+import path from "path";
+import { fileURLToPath } from "url";
 
 // Rute definite
 import userRoutes from "./routes/users.js";
@@ -35,6 +37,10 @@ const connect = () => {
     });
 };
 
+// Obține __dirname în ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 // Middleware-uri
 app.use(cookieParser());
 app.use(express.json());
@@ -53,7 +59,8 @@ const server = http.createServer(app);
 // Inițializare socket.io
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:3000", // frontend-ul tău
+    origin: "*", // Allow all origins
+    methods: ["GET", "POST"],
     credentials: true,
   },
 });
@@ -105,8 +112,18 @@ io.on("connection", (socket) => {
 
 });
 
+// Servire fișiere statice din React în producție
+if (process.env.NODE_ENV === "production") {
+  app.use(express.static(path.join(__dirname, "/client/build")));
+
+  app.get("*", (req, res) => {
+    res.sendFile(path.join(__dirname, "client/build", "index.html"));
+  });
+}
+
 // Pornire server
-server.listen(8000, () => {
+const port = process.env.PORT || 8000;
+server.listen(port, () => {
   connect();
-  console.log("🚀 Server running on port 8000");
+  console.log(`🚀 Server running on port ${port}`);
 });
