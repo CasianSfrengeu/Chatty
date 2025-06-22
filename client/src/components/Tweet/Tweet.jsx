@@ -1,6 +1,6 @@
 // This component ensures real-time updates to the tweet interactions
 
-import axios from "axios";
+import api from "../../api";
 import React, { useState, useEffect } from "react";
 import formatDistance from "date-fns/formatDistance";
 
@@ -27,7 +27,7 @@ const Tweet = ({ tweet, setData }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const findUser = await axios.get(`/users/find/${tweet.userId}`);
+        const findUser = await api.get(`/users/find/${tweet.userId}`);
         setUserData(findUser.data);
       } catch (err) {
         console.log("error", err);
@@ -42,18 +42,18 @@ const Tweet = ({ tweet, setData }) => {
     e.preventDefault();
 
     try {
-      await axios.put(`/tweets/${tweet._id}/like`, {
+      await api.put(`/tweets/${tweet._id}/like`, {
         id: currentUser._id,
       });
 
       if (location.includes("profile")) {
-        const newData = await axios.get(`/tweets/user/all/${id}`);
+        const newData = await api.get(`/tweets/user/all/${id}`);
         setData(newData.data);
       } else if (location.includes("explore")) {
-        const newData = await axios.get(`/tweets/explore`);
+        const newData = await api.get(`/tweets/explore`);
         setData(newData.data);
       } else {
-        const newData = await axios.get(`/tweets/timeline/${currentUser._id}`);
+        const newData = await api.get(`/tweets/timeline/${currentUser._id}`);
         setData(newData.data);
       }
     } catch (err) {

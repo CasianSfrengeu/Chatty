@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import TimelineTweet from "../TimelineTweet/TimelineTweet";
 
 import { useSelector } from "react-redux";
-import axios from "axios";
+import api from "../../api";
 
 const MainTweet = () => {
 
@@ -17,7 +17,7 @@ const MainTweet = () => {
     e.preventDefault();
     try {
       // sending a request to the server and reloading the page to show the new tweet
-      const submitTweet = await axios.post("/tweets", {
+      const submitTweet = await api.post("/tweets", {
         userId: currentUser._id,
         description: tweetText,
       });

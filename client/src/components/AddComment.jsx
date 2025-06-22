@@ -1,6 +1,6 @@
 // src/components/Comments/AddComment.jsx
 import React, { useState } from "react";
-import axios from "axios";
+import api from "../api";
 import { useSelector } from "react-redux";
 
 const AddComment = ({ postId, onCommentAdded }) => {
@@ -12,10 +12,9 @@ const AddComment = ({ postId, onCommentAdded }) => {
     if (!text.trim()) return;
 
     try {
-      await axios.post(
+      await api.post(
         "/comments",
-        { postId, text },
-        { withCredentials: true }
+        { postId, text }
       );
       setText("");
       if (onCommentAdded) onCommentAdded(); // Trigger re-fetch în CommentList

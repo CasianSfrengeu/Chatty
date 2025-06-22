@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import api from "../api";
 import formatDistance from "date-fns/formatDistance";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import FavoriteIcon from "@mui/icons-material/Favorite";
@@ -16,21 +16,29 @@ const CommentList = ({ postId }) => {
   // Fetch comments & user data
   const fetchComments = async () => {
     try {
-      const res = await axios.get(`/comments/${postId}`);
-      setComments(res.data);
+      const res = await api.get(`/comments/${postId}`);
+      
+      // Ensure res.data is an array
+      const commentsData = Array.isArray(res.data) ? res.data : [];
+      setComments(commentsData);
 
-      const userIds = [...new Set(res.data.map((c) => c.userId))];
-      const userRes = await Promise.all(
-        userIds.map((id) => axios.get(`/users/find/${id}`))
-      );
+      if (commentsData.length > 0) {
+        const userIds = [...new Set(commentsData.map((c) => c.userId))];
+        const userRes = await Promise.all(
+          userIds.map((id) => api.get(`/users/find/${id}`))
+        );
 
-      const userMapObj = {};
-      userRes.forEach((res) => {
-        userMapObj[res.data._id] = res.data.username;
-      });
-      setUserMap(userMapObj);
+        const userMapObj = {};
+        userRes.forEach((res) => {
+          if (res.data && res.data._id) {
+            userMapObj[res.data._id] = res.data.username;
+          }
+        });
+        setUserMap(userMapObj);
+      }
     } catch (err) {
       console.error("Eroare la fetch comments", err);
+      setComments([]); // Set empty array on error
     }
   };
 
@@ -40,7 +48,7 @@ const CommentList = ({ postId }) => {
 
   const handleLike = async (commentId) => {
     try {
-      await axios.put(`/comments/${commentId}/like`, {
+      await api.put(`/comments/${commentId}/like`, {
         userId: currentUser._id,
       });
       setComments((prev) =>
@@ -48,9 +56,9 @@ const CommentList = ({ postId }) => {
           c._id === commentId
             ? {
                 ...c,
-                likes: c.likes.includes(currentUser._id)
+                likes: Array.isArray(c.likes) && c.likes.includes(currentUser._id)
                   ? c.likes.filter((id) => id !== currentUser._id)
-                  : [...c.likes, currentUser._id],
+                  : [...(Array.isArray(c.likes) ? c.likes : []), currentUser._id],
               }
             : c
         )
@@ -63,14 +71,13 @@ const CommentList = ({ postId }) => {
   const handleReply = async (parentId) => {
     if (!replyText[parentId]) return;
     try {
-      await axios.post(
+      await api.post(
         "/comments",
         {
           postId,
           text: replyText[parentId],
           parentId,
-        },
-        { withCredentials: true }
+        }
       );
 
       setReplyText((prev) => ({ ...prev, [parentId]: "" }));
@@ -86,9 +93,7 @@ const CommentList = ({ postId }) => {
     if (!confirm) return;
 
     try {
-      await axios.delete(`/comments/${commentId}`, {
-        withCredentials: true,
-      });
+      await api.delete(`/comments/${commentId}`);
       fetchComments();
     } catch (err) {
       console.error("Eroare la ștergere", err);
@@ -113,12 +118,12 @@ const CommentList = ({ postId }) => {
               onClick={() => handleLike(reply._id)}
               className="cursor-pointer flex items-center"
             >
-              {reply.likes.includes(currentUser._id) ? (
+              {Array.isArray(reply.likes) && reply.likes.includes(currentUser._id) ? (
                 <FavoriteIcon fontSize="small" className="text-orange-500" />
               ) : (
                 <FavoriteBorderIcon fontSize="small" />
               )}
-              <span className="ml-1">{reply.likes.length}</span>
+              <span className="ml-1">{Array.isArray(reply.likes) ? reply.likes.length : 0}</span>
             </span>
             {reply.userId === currentUser._id && (
               <DeleteIcon
@@ -133,7 +138,7 @@ const CommentList = ({ postId }) => {
 
   return (
     <div className="space-y-4">
-      {comments
+      {Array.isArray(comments) && comments
         .filter((c) => !c.parentId)
         .map((comment) => (
           <div key={comment._id} className="border-b pb-2">
@@ -150,12 +155,12 @@ const CommentList = ({ postId }) => {
                 onClick={() => handleLike(comment._id)}
                 className="cursor-pointer flex items-center"
               >
-                {comment.likes.includes(currentUser._id) ? (
+                {Array.isArray(comment.likes) && comment.likes.includes(currentUser._id) ? (
                   <FavoriteIcon fontSize="small" className="text-orange-500" />
                 ) : (
                   <FavoriteBorderIcon fontSize="small" />
                 )}
-                <span className="ml-1">{comment.likes.length}</span>
+                <span className="ml-1">{Array.isArray(comment.likes) ? comment.likes.length : 0}</span>
               </span>
               <span
                 onClick={() =>
