@@ -4,7 +4,7 @@ import { useSelector } from "react-redux";
 import { io } from "socket.io-client";
 import formatDistance from "date-fns/formatDistance";
 
-const socket = io("http://localhost:8000");
+const socket = io(window.location.origin);
 
 const MessageBox = ({ conversation }) => {
   const { currentUser } = useSelector((state) => state.user);
