@@ -7,6 +7,7 @@ import mongoose from "mongoose";
 import cookieParser from "cookie-parser";
 import path from "path";
 import { fileURLToPath } from "url";
+import fs from "fs";
 
 // Rute definite
 import userRoutes from "./routes/users.js";
@@ -115,12 +116,34 @@ io.on("connection", (socket) => {
 // Servire fișiere statice din React în producție
 if (process.env.NODE_ENV === "production") {
   console.log("🔧 Production mode: serving static files from client/build");
-  const clientBuildPath = path.join(__dirname, "../client/build");
-  app.use(express.static(clientBuildPath));
-
-  app.get("*", (req, res) => {
-    res.sendFile(path.join(clientBuildPath, "index.html"));
-  });
+  console.log("🔧 Current directory:", __dirname);
+  
+  // Try multiple possible paths for the client build
+  const possiblePaths = [
+    path.join(__dirname, "../client/build"),
+    path.join(__dirname, "../../client/build"),
+    path.join(__dirname, "client/build"),
+    path.join(process.cwd(), "client/build")
+  ];
+  
+  let clientBuildPath = null;
+  for (const testPath of possiblePaths) {
+    if (fs.existsSync(testPath)) {
+      clientBuildPath = testPath;
+      console.log("✅ Found client build at:", clientBuildPath);
+      break;
+    }
+  }
+  
+  if (clientBuildPath) {
+    app.use(express.static(clientBuildPath));
+    
+    app.get("*", (req, res) => {
+      res.sendFile(path.join(clientBuildPath, "index.html"));
+    });
+  } else {
+    console.log("❌ Could not find client build directory. Tried paths:", possiblePaths);
+  }
 }
 
 // Pornire server
