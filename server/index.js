@@ -46,6 +46,9 @@ const __dirname = path.dirname(__filename);
 app.use(cookieParser());
 app.use(express.json());
 
+// Serve uploaded images as static files
+app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
+
 // Rute API
 app.use("/api/users", userRoutes);
 app.use("/api/auth", authRoutes);

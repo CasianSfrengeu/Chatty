@@ -51,7 +51,7 @@ export const userSlice = createSlice({
 
     // updates the user's profile pic
     changeProfile: (state, action) => {
-      state.currentUser.profilePicture = action.payload;
+      state.currentUser = action.payload;
     },
 
     // deals with follow/unfollow actions

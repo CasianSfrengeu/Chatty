@@ -29,9 +29,8 @@ const EditProfile = ({ setOpen }) => {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
-
-      // dispatching an action to update the profile pic
-      dispatch(changeProfile(res.data.profilePicture));
+      // dispatching an action to update the full user object
+      dispatch(changeProfile(res.data));
     // error handling
     } catch (error) {
       console.error("Error uploading image:", error);
