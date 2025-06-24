@@ -43,64 +43,64 @@ const Signin = () => {
 
   return (
     <div className="min-h-screen bg-orange-50 flex items-center justify-center mt-[60px]">
-      <div className="bg-white shadow-lg rounded-lg p-8 w-[90%] max-w-lg">
-        <h2 className="text-3xl font-extrabold text-orange-500 text-center mb-4">
+      <div className="card w-[90%] max-w-lg p-8 flex flex-col gap-6">
+        <h2 className="text-3xl font-extrabold text-orange-500 text-center mb-2">
           Welcome to Chatty
         </h2>
-        <p className="text-center text-gray-500 mb-8">
+        <p className="text-center text-gray-500 mb-4">
           Connect and share your thoughts with the world.
         </p>
 
         {/* ✅ LOGIN */}
-        <form className="space-y-6" onSubmit={handleLogin}>
+        <form className="space-y-4" onSubmit={handleLogin}>
           <input
             type="text"
             placeholder="Username"
-            className="w-full px-4 py-3 border border-orange-300 rounded-lg"
+            className="w-full px-4 py-3 border border-orange-200 rounded-xl bg-orange-50 focus:ring-2 focus:ring-orange-400 focus:outline-none text-lg"
             onChange={(e) => setUsername(e.target.value)}
           />
           <input
             type="password"
             placeholder="Password"
-            className="w-full px-4 py-3 border border-orange-300 rounded-lg"
+            className="w-full px-4 py-3 border border-orange-200 rounded-xl bg-orange-50 focus:ring-2 focus:ring-orange-400 focus:outline-none text-lg"
             onChange={(e) => setPassword(e.target.value)}
           />
           <button
             type="submit"
-            className="w-full bg-orange-500 text-white py-3 rounded-lg hover:bg-orange-600 transition"
+            className="w-full orange-gradient py-3 rounded-xl font-semibold text-lg shadow-md hover:scale-105 transition"
           >
             Sign In
           </button>
         </form>
 
-        <div className="relative my-6">
-          <span className="absolute inset-x-0 top-2/4 transform -translate-y-2/4 h-[1px] bg-gray-300"></span>
+        <div className="relative my-2">
+          <span className="absolute inset-x-0 top-2/4 transform -translate-y-2/4 h-[1px] bg-gray-200"></span>
           <span className="bg-white px-4 text-gray-500 relative text-sm">or</span>
         </div>
 
         {/* ✅ SIGNUP */}
-        <form className="space-y-6" onSubmit={handleSignup}>
+        <form className="space-y-4" onSubmit={handleSignup}>
           <input
             type="text"
             placeholder="Username"
-            className="w-full px-4 py-3 border border-orange-300 rounded-lg"
+            className="w-full px-4 py-3 border border-orange-200 rounded-xl bg-orange-50 focus:ring-2 focus:ring-orange-400 focus:outline-none text-lg"
             onChange={(e) => setUsername(e.target.value)}
           />
           <input
             type="email"
             placeholder="Email"
-            className="w-full px-4 py-3 border border-orange-300 rounded-lg"
+            className="w-full px-4 py-3 border border-orange-200 rounded-xl bg-orange-50 focus:ring-2 focus:ring-orange-400 focus:outline-none text-lg"
             onChange={(e) => setEmail(e.target.value)}
           />
           <input
             type="password"
             placeholder="Password"
-            className="w-full px-4 py-3 border border-orange-300 rounded-lg"
+            className="w-full px-4 py-3 border border-orange-200 rounded-xl bg-orange-50 focus:ring-2 focus:ring-orange-400 focus:outline-none text-lg"
             onChange={(e) => setPassword(e.target.value)}
           />
           <button
             type="submit"
-            className="w-full bg-orange-500 text-white py-3 rounded-lg hover:bg-orange-600 transition"
+            className="w-full orange-gradient py-3 rounded-xl font-semibold text-lg shadow-md hover:scale-105 transition"
           >
             Sign Up
           </button>

@@ -62,42 +62,55 @@ const Tweet = ({ tweet, setData }) => {
   };
 
   return (
-    <div className="bg-white shadow-md border border-orange-300 rounded-lg p-4 space-y-2">
-      {userData && (
-        <>
-          {/* User Info */}
-          <div className="flex items-center space-x-3">
-            <Link to={`/profile/${userData._id}`} className="font-bold text-orange-500 hover:underline">
-              {userData.username}
-            </Link>
-            <span className="text-gray-600">@{userData.username}</span>
-            <p className="text-gray-500"> - {dateStr}</p>
-          </div>
+    <div className="flex flex-col gap-2">
+      {/* Header: Avatar, Username, Date */}
+      <div className="flex items-center gap-3 mb-1">
+        <img
+          src={userData?.profilePicture || "/default-avatar.png"}
+          alt="avatar"
+          className="w-10 h-10 rounded-full border-2 border-orange-200 object-cover shadow-sm"
+        />
+        <div className="flex flex-col">
+          <span className="font-semibold text-orange-500 text-base leading-tight">
+            {userData?.username || "User"}
+          </span>
+          <span className="text-xs text-gray-400 font-medium">
+            {dateStr} ago
+          </span>
+        </div>
+      </div>
 
-          {/* Tweet Content */}
-          <p className="text-gray-800">{tweet.description}</p>
+      {/* Tweet Content */}
+      <div className="text-lg text-gray-800 mb-2 break-words">
+        {tweet.description}
+      </div>
 
-          {/* Like Button */}
-          <button onClick={handleLike} className="flex items-center space-x-1 text-gray-700 hover:text-orange-500 transition">
-            {tweet.likes.includes(currentUser._id) ? (
-              <FavoriteIcon className="text-orange-500" />
-            ) : (
-              <FavoriteBorderIcon />
-            )}
-            <span>{tweet.likes.length}</span>
-          </button>
+      {/* Actions */}
+      <div className="flex items-center gap-6 text-orange-500 mt-1 mb-2">
+        <button
+          className="flex items-center gap-1 hover:text-orange-600 transition"
+          onClick={handleLike}
+        >
+          {Array.isArray(tweet.likes) && tweet.likes.includes(currentUser._id) ? (
+            <FavoriteIcon fontSize="small" />
+          ) : (
+            <FavoriteBorderIcon fontSize="small" />
+          )}
+          <span className="text-sm font-semibold">
+            {Array.isArray(tweet.likes) ? tweet.likes.length : 0}
+          </span>
+        </button>
+        <span className="text-gray-400 text-sm">•</span>
+        <span className="text-gray-500 text-sm">
+          {tweet.comments?.length || 0} Comments
+        </span>
+      </div>
 
-          {/* 🔽 Comentarii */}
-          <div className="mt-4 border-t border-orange-200 pt-4 space-y-3">
-            <h4 className="text-orange-500 font-semibold text-sm">Comentarii</h4>
-            <AddComment
-              postId={tweet._id}
-              onCommentAdded={() => setRefreshComments((prev) => !prev)}
-            />
-            <CommentList postId={tweet._id} key={refreshComments} />
-          </div>
-        </>
-      )}
+      {/* Comments Section */}
+      <div className="mt-2 bg-orange-50 rounded-xl p-3">
+        <AddComment postId={tweet._id} onCommentAdded={() => setRefreshComments(!refreshComments)} />
+        <CommentList postId={tweet._id} key={refreshComments} />
+      </div>
     </div>
   );
 };

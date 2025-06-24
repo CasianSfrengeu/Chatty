@@ -77,15 +77,14 @@ const Profile = () => {
         </div>
 
         {/* Profile Section */}
-        <div className="col-span-2 flex flex-col items-center p-6 bg-orange-50 border-x border-orange-300 shadow-md">
-          {userProfile && (
-            <>
-              {/* Profile Header */}
-              <div className="w-full flex flex-col items-center text-center space-y-4">
+        <div className="col-span-2 flex flex-col items-center p-6 bg-orange-50 border-x border-orange-200 shadow-md min-h-screen">
+          <div className="w-full max-w-2xl">
+            {userProfile && (
+              <div className="card mb-6 flex flex-col items-center text-center gap-4">
                 <img
                   src={userProfile.profilePicture || "/default-avatar.png"}
                   alt="Profile"
-                  className="w-24 h-24 rounded-full border-4 border-orange-300 shadow-md"
+                  className="w-24 h-24 rounded-full border-4 border-orange-200 shadow-md object-cover"
                 />
                 <h2 className="text-2xl font-bold text-orange-500">
                   {userProfile.username}
@@ -95,39 +94,39 @@ const Profile = () => {
                 {/* Follow & Edit Profile Button */}
                 {currentUser._id === id ? (
                   <button
-                    className="px-4 py-2 bg-orange-500 text-white rounded-full hover:bg-orange-600 transition"
+                    className="px-4 py-2 orange-gradient text-white rounded-full font-semibold hover:scale-105 transition"
                     onClick={() => setOpen(true)}
                   >
                     Edit Profile
                   </button>
                 ) : currentUser.following.includes(id) ? (
                   <button
-                    className="px-4 py-2 bg-gray-500 text-white rounded-full hover:bg-gray-600 transition"
+                    className="px-4 py-2 bg-gray-500 text-white rounded-full font-semibold hover:bg-gray-600 transition"
                     onClick={handleFollow}
                   >
                     Following
                   </button>
                 ) : (
                   <button
-                    className="px-4 py-2 bg-orange-500 text-white rounded-full hover:bg-orange-600 transition"
+                    className="px-4 py-2 orange-gradient text-white rounded-full font-semibold hover:scale-105 transition"
                     onClick={handleFollow}
                   >
                     Follow
                   </button>
                 )}
               </div>
+            )}
 
-              {/* User Tweets */}
-              <div className="w-full mt-6 space-y-4">
-                {userTweets &&
-                  userTweets.map((tweet) => (
-                    <div className="p-2" key={tweet._id}>
-                      <Tweet tweet={tweet} setData={setUserTweets} />
-                    </div>
-                  ))}
-              </div>
-            </>
-          )}
+            {/* User Tweets */}
+            <div className="w-full space-y-6">
+              {userTweets &&
+                userTweets.map((tweet) => (
+                  <div className="card" key={tweet._id}>
+                    <Tweet tweet={tweet} setData={setUserTweets} />
+                  </div>
+                ))}
+            </div>
+          </div>
         </div>
 
         {/* Right Sidebar */}

@@ -59,10 +59,10 @@ const EditProfile = ({ setOpen }) => {
 
   return (
     <div className="fixed inset-0 bg-orange-50 bg-opacity-75 flex items-center justify-center z-50">
-      <div className="bg-white shadow-lg rounded-lg p-6 w-[90%] max-w-lg relative">
+      <div className="modal relative">
         <button
           onClick={() => setOpen(false)}
-          className="absolute top-3 right-3 text-gray-500 hover:text-gray-800 transition duration-200"
+          className="absolute top-3 right-3 text-gray-500 hover:text-gray-800 transition duration-200 text-2xl"
         >
           ✕
         </button>
@@ -84,7 +84,7 @@ const EditProfile = ({ setOpen }) => {
               type="file"
               accept="image/*"
               onChange={(e) => setImg(e.target.files[0])}
-              className="w-full px-4 py-3 border border-orange-300 rounded-lg focus:outline-none focus:ring focus:ring-orange-500 focus:border-orange-500"
+              className="w-full px-4 py-3 border border-orange-200 rounded-xl focus:outline-none focus:ring focus:ring-orange-400"
             />
           )}
         </div>
@@ -94,7 +94,7 @@ const EditProfile = ({ setOpen }) => {
           <p className="text-gray-600 mb-4">Want to delete your account?</p>
           <button
             onClick={handleDelete}
-            className="w-full bg-red-500 text-white py-3 rounded-lg font-semibold hover:bg-red-600 transition duration-300"
+            className="w-full bg-red-500 text-white py-3 rounded-xl font-semibold hover:bg-red-600 transition duration-300"
           >
             Delete Account
           </button>

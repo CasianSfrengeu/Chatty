@@ -24,16 +24,16 @@ const AddComment = ({ postId, onCommentAdded }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="flex items-center space-x-2 mt-2">
+    <form onSubmit={handleSubmit} className="flex items-center gap-2 mt-2">
       <input
         type="text"
-        placeholder="Adaugă un comentariu..."
+        placeholder="Add a comment..."
         value={text}
         onChange={(e) => setText(e.target.value)}
-        className="flex-1 px-3 py-2 border border-gray-300 rounded"
+        className="flex-1 px-3 py-2 border border-orange-200 rounded-xl bg-orange-50 focus:ring-2 focus:ring-orange-400 focus:outline-none text-sm"
       />
-      <button className="bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600">
-        Postează
+      <button className="orange-gradient px-4 py-2 rounded-xl font-semibold text-sm shadow-md hover:scale-105 transition">
+        Post
       </button>
     </form>
   );

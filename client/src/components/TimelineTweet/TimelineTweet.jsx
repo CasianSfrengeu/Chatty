@@ -47,12 +47,12 @@ const TimelineTweet = () => {
   }
 
   return (
-    <div className="mt-6 space-y-4">
+    <div className="mt-6 space-y-6">
       {timeLine && Array.isArray(timeLine) && timeLine.length > 0 ? (
         timeLine.map((tweet) => (
           <div
             key={tweet._id}
-            className="bg-white shadow-md border border-orange-300 rounded-lg p-4"
+            className="card hover:shadow-xl transition duration-200"
           >
             <Tweet tweet={tweet} setData={setTimeLine} />
           </div>
