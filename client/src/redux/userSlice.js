@@ -30,6 +30,7 @@ export const userSlice = createSlice({
     loginSuccess: (state, action) => {
       state.isLoading = false;
       state.currentUser = action.payload;
+      state.error = false;
     },
 
     // called if login fails
@@ -41,6 +42,10 @@ export const userSlice = createSlice({
 
     // logout resets the whole user state and the user gets logged out
     logout: (state) => {
+      // Clear any persisted data from localStorage
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('persist:root');
+      }
       return initialState;
     },
 

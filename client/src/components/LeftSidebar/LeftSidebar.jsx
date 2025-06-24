@@ -1,5 +1,5 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 import HomeIcon from "@mui/icons-material/Home";
 import TagIcon from "@mui/icons-material/Tag";
@@ -15,10 +15,12 @@ const LeftSidebar = () => {
   // getting the current logged-in user from the Redux store
   const { currentUser } = useSelector((state) => state.user);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   
   // handling the logout action
   const handleLogout = () => {
     dispatch(logout()); //dispatch logout action from Redux
+    navigate("/signin"); //navigate to signin page
   };
 
   return (
@@ -54,7 +56,7 @@ const LeftSidebar = () => {
 
       {/* User Info + Profile & Logout Buttons */}
       <div className="border-t border-gray-300 pt-4">
-        <Link to={`/profile/${currentUser._id}`}>
+        <Link to={`/profile/${currentUser?._id}`}>
           <div className="flex items-center space-x-4 px-4 py-3 rounded-full cursor-pointer hover:bg-orange-100 transition">
             <PersonIcon className="text-orange-500" fontSize="large" />
             <p className="text-gray-700 font-medium">Profile</p>
