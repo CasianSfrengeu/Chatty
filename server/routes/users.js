@@ -7,6 +7,7 @@ import path from "path";
 import { getUser, update, deleteUser, follow, unFollow } from "../controllers/user.js";
 import { verifyToken } from "../verifyToken.js";
 import { getUserByUsername } from "../controllers/user.js";
+import User from "../models/User.js";
 
 const router = express.Router();
 
