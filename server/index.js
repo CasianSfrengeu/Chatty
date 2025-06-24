@@ -49,6 +49,13 @@ app.use(express.json());
 // Serve uploaded images as static files
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
+// Ensure uploads directory exists
+const uploadsPath = path.join(__dirname, '../uploads');
+if (!fs.existsSync(uploadsPath)) {
+  fs.mkdirSync(uploadsPath, { recursive: true });
+  console.log('Created uploads directory at', uploadsPath);
+}
+
 // Rute API
 app.use("/api/users", userRoutes);
 app.use("/api/auth", authRoutes);

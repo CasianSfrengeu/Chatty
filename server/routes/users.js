@@ -28,19 +28,22 @@ const upload = multer({ storage });
 // upload.single used to process a single file from the req body
 router.put("/:id/profile", verifyToken, upload.single("image"), async (req, res) => {
   try {
-    // generates a URL for the uploaded image
+    console.log("[UPLOAD] req.file:", req.file);
+    console.log("[UPLOAD] req.body:", req.body);
+    if (!req.file) {
+      console.error("[UPLOAD] No file received");
+      return res.status(400).json({ error: "No file uploaded" });
+    }
     const filePath = `${req.protocol}://${req.get("host")}/uploads/${req.file.filename}`;
-    // updates the profile picture field in the database
     const updatedUser = await User.findByIdAndUpdate(
       req.params.id,
       { profilePicture: filePath },
       { new: true }
     );
-    // the updated user object is returned in JSON format
     res.status(200).json(updatedUser);
   } catch (err) {
-    // we return an error if anything goes wrong
-    res.status(500).json({ error: "Error uploading image" });
+    console.error("[UPLOAD] Error uploading image:", err);
+    res.status(500).json({ error: "Error uploading image", details: err.message });
   }
 });
 
