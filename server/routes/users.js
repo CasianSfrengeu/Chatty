@@ -13,11 +13,15 @@ const router = express.Router();
 
 // configuring multer to handle file uploads
 const storage = multer.diskStorage({
-  // multer will store the uploaded profile pictures in the uploads folder
   destination: (req, file, cb) => {
-    cb(null, "uploads/");
+    try {
+      const dest = path.join(__dirname, "../../uploads");
+      cb(null, dest);
+    } catch (err) {
+      console.error("[MULTER] Error setting upload destination:", err);
+      cb(err);
+    }
   },
-  // filename dinamically modified using Date.now() so that users can upload pictures with the same name with overwriting issues
   filename: (req, file, cb) => {
     const uniqueName = `${Date.now()}-${file.originalname}`;
     cb(null, uniqueName);
