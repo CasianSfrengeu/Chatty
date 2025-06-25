@@ -8,6 +8,10 @@ import { getUser, update, deleteUser, follow, unFollow } from "../controllers/us
 import { verifyToken } from "../verifyToken.js";
 import { getUserByUsername } from "../controllers/user.js";
 import User from "../models/User.js";
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const router = express.Router();
 
