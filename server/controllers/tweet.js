@@ -17,9 +17,14 @@ import User from "../models/User.js";
 
 // Function to extract hashtags from text
 const extractHashtags = (text) => {
-  const hashtagRegex = /#[\w\u0590-\u05ff]+/g;
-  const hashtags = text.match(hashtagRegex);
-  return hashtags ? hashtags.map(tag => tag.toLowerCase()) : [];
+  const hashtagRegex = /#(\w+)/g;
+  const hashtags = [];
+  let match;
+  while ((match = hashtagRegex.exec(text))) {
+    const tag = match[1].toLowerCase();
+    if (!hashtags.includes(tag)) hashtags.push(tag);
+  }
+  return hashtags;
 };
 
 // the createTweet function creates a new tweet object from the req body
