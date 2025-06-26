@@ -2,12 +2,7 @@ import React, { useState, useEffect } from "react";
 import api from "../../api";
 
 const RightSidebar = ({ onHashtagClick }) => {
-  const [trendingHashtags, setTrendingHashtags] = useState([
-    { _id: "music", count: 15 },
-    { _id: "movies", count: 12 },
-    { _id: "politics", count: 8 },
-    { _id: "romania", count: 6 }
-  ]);
+  const [trendingHashtags, setTrendingHashtags] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
@@ -15,17 +10,13 @@ const RightSidebar = ({ onHashtagClick }) => {
       try {
         setIsLoading(true);
         const response = await api.get("/tweets/trending-hashtags");
-        if (Array.isArray(response.data) && response.data.length > 0) {
-          setTrendingHashtags(response.data);
-        }
+        setTrendingHashtags(Array.isArray(response.data) ? response.data : []);
       } catch (err) {
-        console.error("Error fetching trending hashtags:", err);
-        // Keep default hashtags if API fails
+        setTrendingHashtags([]);
       } finally {
         setIsLoading(false);
       }
     };
-
     fetchTrendingHashtags();
   }, []);
 
@@ -39,7 +30,6 @@ const RightSidebar = ({ onHashtagClick }) => {
     <div className="p-6 bg-orange-50 border border-orange-300 rounded-lg shadow-md mx-4 space-y-4">
       {/* Trending Title */}
       <h2 className="text-xl font-bold text-orange-500">Trending</h2>
-
       {/* Trending Topics */}
       <div className="space-y-3">
         {isLoading ? (
@@ -47,6 +37,8 @@ const RightSidebar = ({ onHashtagClick }) => {
             <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-orange-500 mx-auto"></div>
             <p className="text-gray-600 text-sm mt-2">Loading trends...</p>
           </div>
+        ) : trendingHashtags.length === 0 ? (
+          <div className="text-gray-400 text-center">No trending hashtags yet.</div>
         ) : (
           trendingHashtags.map((hashtag) => (
             <div
