@@ -56,16 +56,16 @@ router.put("/:id/profile", verifyToken, upload.single("image"), async (req, res)
   }
 });
 
-// existing routes
-router.put("/:id", verifyToken, update);
+// Specific routes first (before generic :id route)
 router.get("/find/:id", getUser);
-router.delete("/:id", verifyToken, deleteUser);
+router.get("/username/:username", getUserByUsername);
 router.put("/follow/:id", verifyToken, follow);
 router.put("/unfollow/:id", verifyToken, unFollow);
-router.get("/username/:username", getUserByUsername);
-
-// new routes for privacy settings
 router.put("/request-follow/:id", verifyToken, requestFollow);
 router.put("/respond-follow-request/:id", verifyToken, respondToFollowRequest);
+
+// Generic routes last
+router.put("/:id", verifyToken, update);
+router.delete("/:id", verifyToken, deleteUser);
 
 export default router;
