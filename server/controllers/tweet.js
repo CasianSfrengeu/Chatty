@@ -30,18 +30,12 @@ const extractHashtags = (text) => {
 // the createTweet function creates a new tweet object from the req body
 export const createTweet = async (req, res, next) => {
   try {
-    // Extract hashtags from the description
     const hashtags = extractHashtags(req.body.description);
-    
-    // Create tweet with hashtags
     const newTweet = new Tweet({
       ...req.body,
-      hashtags: hashtags
+      hashtags,
     });
-    
-    // the tweet is saved to the database 
     const savedTweet = await newTweet.save();
-    // the created tweet is returned as JSON
     res.status(200).json(savedTweet);
   } catch (err) {
     handleError(500, err);
@@ -160,22 +154,12 @@ export const searchTweets = async (req, res, next) => {
 export const searchByHashtag = async (req, res, next) => {
   try {
     const { hashtag } = req.params;
-    
-    if (!hashtag) {
-      return res.status(400).json({ message: "Hashtag is required" });
-    }
-
-    // Remove # if present and convert to lowercase
-    const cleanHashtag = hashtag.replace('#', '').toLowerCase();
-    
-    // Search tweets by hashtag
-    const hashtagResults = await Tweet.find({
-      hashtags: cleanHashtag
-    }).sort({ createdAt: -1 }); // Sort by newest first
-
+    if (!hashtag) return res.status(400).json({ message: "Hashtag is required" });
+    // Remove all leading # and lowercase
+    const cleanHashtag = hashtag.replace(/^#+/, '').toLowerCase();
+    const hashtagResults = await Tweet.find({ hashtags: cleanHashtag }).sort({ createdAt: -1 });
     res.status(200).json(hashtagResults);
   } catch (err) {
-    console.error("Hashtag search error:", err);
     handleError(500, err);
   }
 };
