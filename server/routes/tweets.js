@@ -12,6 +12,8 @@ import {
   getUserTweets,
   getExploreTweets,
   searchTweets,
+  searchByHashtag,
+  getTrendingHashtags,
 } from "../controllers/tweet.js";
 
 // creating a new router instance
@@ -36,5 +38,11 @@ router.get("/explore", getExploreTweets);
 
 //search tweets
 router.get("/search", searchTweets);
+
+//search by hashtag
+router.get("/hashtag/:hashtag", searchByHashtag);
+
+//get trending hashtags
+router.get("/trending-hashtags", getTrendingHashtags);
 
 export default router;

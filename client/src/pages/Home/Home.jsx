@@ -4,6 +4,7 @@ import LeftSidebar from "../../components/LeftSidebar/LeftSidebar";
 import MainTweet from "../../components/MainTweet/MainTweet";
 import RightSidebar from "../../components/RightSidebar/RightSidebar";
 import SearchResults from "../../components/SearchResults/SearchResults";
+import HashtagResults from "../../components/HashtagResults/HashtagResults";
 import Signin from "../Signin/Signin";
 
 // useSelector retrieves the current user's authentication status
@@ -12,7 +13,7 @@ import { useSelector } from "react-redux";
 const Home = () => {
   // currentUser retrieves the user's current authentication state
   const { currentUser } = useSelector((state) => state.user);
-  const { searchQuery } = useOutletContext();
+  const { searchQuery, selectedHashtag, handleHashtagClick } = useOutletContext();
 
   return (
     <>
@@ -30,6 +31,8 @@ const Home = () => {
           <div className="col-span-2 flex flex-col items-center p-6">
             {searchQuery ? (
               <SearchResults searchQuery={searchQuery} />
+            ) : selectedHashtag ? (
+              <HashtagResults hashtag={selectedHashtag} />
             ) : (
               <MainTweet />
             )}
@@ -37,7 +40,7 @@ const Home = () => {
 
           {/* Right Sidebar (Trending Section) */}
           <div className="hidden md:block px-4">
-            <RightSidebar />
+            <RightSidebar onHashtagClick={handleHashtagClick} />
           </div>
         </div>
       )}

@@ -19,6 +19,11 @@ const TweetSchema = new mongoose.Schema(
       type: Array,
       defaultValue: [],
     },
+    // hashtags array to store extracted hashtags
+    hashtags: {
+      type: [String],
+      default: [],
+    },
   },
   { timestamps: true }
 );

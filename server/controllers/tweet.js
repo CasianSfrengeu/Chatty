@@ -7,6 +7,7 @@
 -fetching a specific user's tweets
 -fetching trending tweets for the explore page
 -searching tweets by content
+-searching tweets by hashtags
 
 */
 
@@ -14,11 +15,25 @@ import Tweet from "../models/Tweet.js";
 import { handleError } from "../error.js";
 import User from "../models/User.js";
 
+// Function to extract hashtags from text
+const extractHashtags = (text) => {
+  const hashtagRegex = /#[\w\u0590-\u05ff]+/g;
+  const hashtags = text.match(hashtagRegex);
+  return hashtags ? hashtags.map(tag => tag.toLowerCase()) : [];
+};
 
 // the createTweet function creates a new tweet object from the req body
 export const createTweet = async (req, res, next) => {
-  const newTweet = new Tweet(req.body);
   try {
+    // Extract hashtags from the description
+    const hashtags = extractHashtags(req.body.description);
+    
+    // Create tweet with hashtags
+    const newTweet = new Tweet({
+      ...req.body,
+      hashtags: hashtags
+    });
+    
     // the tweet is saved to the database 
     const savedTweet = await newTweet.save();
     // the created tweet is returned as JSON
@@ -132,6 +147,53 @@ export const searchTweets = async (req, res, next) => {
     res.status(200).json(searchResults);
   } catch (err) {
     console.error("Search error:", err);
+    handleError(500, err);
+  }
+};
+
+// searching tweets by hashtag
+export const searchByHashtag = async (req, res, next) => {
+  try {
+    const { hashtag } = req.params;
+    
+    if (!hashtag) {
+      return res.status(400).json({ message: "Hashtag is required" });
+    }
+
+    // Remove # if present and convert to lowercase
+    const cleanHashtag = hashtag.replace('#', '').toLowerCase();
+    
+    // Search tweets by hashtag
+    const hashtagResults = await Tweet.find({
+      hashtags: cleanHashtag
+    }).sort({ createdAt: -1 }); // Sort by newest first
+
+    res.status(200).json(hashtagResults);
+  } catch (err) {
+    console.error("Hashtag search error:", err);
+    handleError(500, err);
+  }
+};
+
+// get trending hashtags
+export const getTrendingHashtags = async (req, res, next) => {
+  try {
+    // Aggregate to get hashtag counts
+    const trendingHashtags = await Tweet.aggregate([
+      { $unwind: "$hashtags" },
+      {
+        $group: {
+          _id: "$hashtags",
+          count: { $sum: 1 }
+        }
+      },
+      { $sort: { count: -1 } },
+      { $limit: 10 }
+    ]);
+
+    res.status(200).json(trendingHashtags);
+  } catch (err) {
+    console.error("Trending hashtags error:", err);
     handleError(500, err);
   }
 };

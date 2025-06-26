@@ -14,23 +14,37 @@ import Chat from "./pages/Chat/Chat";
 // navbar followed by the main content
 const Layout = () => {
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedHashtag, setSelectedHashtag] = useState("");
   const location = useLocation();
 
-  // Clear search when navigating away from home
+  // Clear search and hashtag when navigating away from home
   useEffect(() => {
     if (location.pathname !== "/") {
       setSearchQuery("");
+      setSelectedHashtag("");
     }
   }, [location.pathname]);
 
   const handleSearch = (query) => {
     setSearchQuery(query);
+    setSelectedHashtag(""); // Clear hashtag when searching
+  };
+
+  const handleHashtagClick = (hashtag) => {
+    setSelectedHashtag(hashtag);
+    setSearchQuery(""); // Clear search when clicking hashtag
   };
 
   return (
     <div className="md:w-8/12 mx-auto">
       <Navbar onSearch={handleSearch} />
-      <Outlet context={{ searchQuery, setSearchQuery }} />
+      <Outlet context={{ 
+        searchQuery, 
+        setSearchQuery, 
+        selectedHashtag, 
+        setSelectedHashtag,
+        handleHashtagClick 
+      }} />
     </div>
   );
 };
