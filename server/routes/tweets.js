@@ -11,6 +11,7 @@ import {
   getAllTweets,
   getUserTweets,
   getExploreTweets,
+  searchTweets,
 } from "../controllers/tweet.js";
 
 // creating a new router instance
@@ -32,4 +33,8 @@ router.get("/user/all/:id", getUserTweets);
 
 //explore
 router.get("/explore", getExploreTweets);
+
+//search tweets
+router.get("/search", searchTweets);
+
 export default router;

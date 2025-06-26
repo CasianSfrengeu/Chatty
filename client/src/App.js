@@ -1,4 +1,5 @@
-import { createBrowserRouter, RouterProvider, Outlet } from "react-router-dom";
+import { createBrowserRouter, RouterProvider, Outlet, useLocation } from "react-router-dom";
+import { useState, useEffect } from "react";
 
 import "./App.css";
 import Home from "./pages/Home/Home";
@@ -12,14 +13,27 @@ import Chat from "./pages/Chat/Chat";
 // wrapping the pages with a consistent layout
 // navbar followed by the main content
 const Layout = () => {
+  const [searchQuery, setSearchQuery] = useState("");
+  const location = useLocation();
+
+  // Clear search when navigating away from home
+  useEffect(() => {
+    if (location.pathname !== "/") {
+      setSearchQuery("");
+    }
+  }, [location.pathname]);
+
+  const handleSearch = (query) => {
+    setSearchQuery(query);
+  };
+
   return (
     <div className="md:w-8/12 mx-auto">
-      <Navbar />
-      <Outlet></Outlet>
+      <Navbar onSearch={handleSearch} />
+      <Outlet context={{ searchQuery, setSearchQuery }} />
     </div>
   );
 };
-
 
 // app router configuration
 const router = createBrowserRouter([

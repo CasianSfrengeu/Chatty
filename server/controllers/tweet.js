@@ -6,6 +6,7 @@
 -fetching timeline tweets
 -fetching a specific user's tweets
 -fetching trending tweets for the explore page
+-searching tweets by content
 
 */
 
@@ -107,6 +108,30 @@ export const getExploreTweets = async (req, res, next) => {
 
     res.status(200).json(getExploreTweets);
   } catch (err) {
+    handleError(500, err);
+  }
+};
+
+// searching tweets by content
+export const searchTweets = async (req, res, next) => {
+  try {
+    const { query } = req.query;
+    
+    if (!query || query.trim() === '') {
+      return res.status(400).json({ message: "Search query is required" });
+    }
+
+    // Create case-insensitive regex pattern
+    const searchRegex = new RegExp(query.trim(), 'i');
+    
+    // Search tweets by description content
+    const searchResults = await Tweet.find({
+      description: { $regex: searchRegex }
+    }).sort({ createdAt: -1 }); // Sort by newest first
+
+    res.status(200).json(searchResults);
+  } catch (err) {
+    console.error("Search error:", err);
     handleError(500, err);
   }
 };

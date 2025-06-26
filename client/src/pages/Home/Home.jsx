@@ -1,7 +1,9 @@
 import React from "react";
+import { useOutletContext } from "react-router-dom";
 import LeftSidebar from "../../components/LeftSidebar/LeftSidebar";
 import MainTweet from "../../components/MainTweet/MainTweet";
 import RightSidebar from "../../components/RightSidebar/RightSidebar";
+import SearchResults from "../../components/SearchResults/SearchResults";
 import Signin from "../Signin/Signin";
 
 // useSelector retrieves the current user's authentication status
@@ -10,6 +12,7 @@ import { useSelector } from "react-redux";
 const Home = () => {
   // currentUser retrieves the user's current authentication state
   const { currentUser } = useSelector((state) => state.user);
+  const { searchQuery } = useOutletContext();
 
   return (
     <>
@@ -25,7 +28,11 @@ const Home = () => {
 
           {/* Main Content */}
           <div className="col-span-2 flex flex-col items-center p-6">
-            <MainTweet />
+            {searchQuery ? (
+              <SearchResults searchQuery={searchQuery} />
+            ) : (
+              <MainTweet />
+            )}
           </div>
 
           {/* Right Sidebar (Trending Section) */}
