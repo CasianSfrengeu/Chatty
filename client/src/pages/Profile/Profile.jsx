@@ -8,7 +8,7 @@ import { useSelector, useDispatch } from "react-redux";
 import api from "../../api";
 import Tweet from "../../components/Tweet/Tweet";
 
-import { following } from "../../redux/userSlice";
+import { following, addFollowRequest } from "../../redux/userSlice";
 
 /*
 
@@ -22,6 +22,9 @@ const Profile = () => {
   const { currentUser } = useSelector((state) => state.user);
   const [userTweets, setUserTweets] = useState([]); // storing user's tweets
   const [userProfile, setUserProfile] = useState(null); // storing user profile information
+  const [isFollowing, setIsFollowing] = useState(false);
+  const [hasRequestedFollow, setHasRequestedFollow] = useState(false);
+  const [isOwnProfile, setIsOwnProfile] = useState(false);
 
   const { id } = useParams(); // extracting the user id
   const dispatch = useDispatch();
@@ -35,6 +38,11 @@ const Profile = () => {
 
         setUserTweets(Array.isArray(userTweets.data) ? userTweets.data : []);
         setUserProfile(userProfile.data);
+        
+        // Check if current user is following this profile
+        setIsFollowing(currentUser.following.includes(id));
+        setHasRequestedFollow(userProfile.data.pendingFollowers?.includes(currentUser._id) || false);
+        setIsOwnProfile(currentUser._id === id);
       } catch (err) {
         console.log("error", err);
         setUserTweets([]);
@@ -46,27 +54,74 @@ const Profile = () => {
 
   // follow/unfollow functionality
   const handleFollow = async () => {
-    // if the current user isn't already following that user
-    if (!currentUser.following.includes(id)) {
-      try {
-        // PUT request to send a follow request
-        await api.put(`/users/follow/${id}`, { id: currentUser._id });
-        // updating redux store
-        dispatch(following(id));
-      } catch (err) {
-        console.log("error", err);
+    try {
+      if (userProfile.isPrivate) {
+        // Handle private account follow request
+        if (!hasRequestedFollow) {
+          await api.put(`/users/request-follow/${id}`, { id: currentUser._id });
+          setHasRequestedFollow(true);
+          // Update Redux state to add to pending followers
+          dispatch(addFollowRequest(currentUser._id));
+        }
+      } else {
+        // Handle public account follow/unfollow
+        if (!isFollowing) {
+          await api.put(`/users/follow/${id}`, { id: currentUser._id });
+          dispatch(following(id));
+          setIsFollowing(true);
+        } else {
+          await api.put(`/users/unfollow/${id}`, { id: currentUser._id });
+          dispatch(following(id));
+          setIsFollowing(false);
+        }
+      }
+    } catch (err) {
+      console.log("error", err);
+    }
+  };
+
+  // Get follow button text and styling
+  const getFollowButtonProps = () => {
+    if (isOwnProfile) {
+      return {
+        text: "Edit Profile",
+        className: "px-4 py-2 orange-gradient text-white rounded-full font-semibold hover:scale-105 transition",
+        onClick: () => setOpen(true)
+      };
+    }
+
+    if (userProfile?.isPrivate) {
+      if (hasRequestedFollow) {
+        return {
+          text: "Request Sent",
+          className: "px-4 py-2 bg-gray-400 text-white rounded-full font-semibold cursor-not-allowed",
+          onClick: null
+        };
+      } else {
+        return {
+          text: "Request Follow",
+          className: "px-4 py-2 orange-gradient text-white rounded-full font-semibold hover:scale-105 transition",
+          onClick: handleFollow
+        };
       }
     } else {
-      try {
-        // PUT request to send an unfollow request
-        await api.put(`/users/unfollow/${id}`, { id: currentUser._id });
-        // updating redux store
-        dispatch(following(id));
-      } catch (err) {
-        console.log("error", err);
+      if (isFollowing) {
+        return {
+          text: "Following",
+          className: "px-4 py-2 bg-gray-500 text-white rounded-full font-semibold hover:bg-gray-600 transition",
+          onClick: handleFollow
+        };
+      } else {
+        return {
+          text: "Follow",
+          className: "px-4 py-2 orange-gradient text-white rounded-full font-semibold hover:scale-105 transition",
+          onClick: handleFollow
+        };
       }
     }
   };
+
+  const followButtonProps = getFollowButtonProps();
 
   return (
     <>
@@ -80,7 +135,21 @@ const Profile = () => {
         <div className="col-span-2 flex flex-col items-center p-6 bg-orange-50 border-x border-orange-200 shadow-md min-h-screen">
           <div className="w-full max-w-2xl">
             {userProfile && (
-              <div className="card mb-6 flex flex-col items-center text-center gap-4">
+              <div 
+                className="card mb-6 flex flex-col items-center text-center gap-4 relative overflow-hidden"
+                style={{ 
+                  background: `linear-gradient(135deg, ${userProfile.backgroundColor}15, ${userProfile.backgroundColor}08)`,
+                  borderColor: `${userProfile.backgroundColor}30`
+                }}
+              >
+                {/* Privacy Badge */}
+                {userProfile.isPrivate && (
+                  <div className="absolute top-4 right-4 bg-orange-100 text-orange-700 px-3 py-1 rounded-full text-sm font-semibold flex items-center gap-1">
+                    <span className="w-2 h-2 bg-orange-500 rounded-full"></span>
+                    Private
+                  </div>
+                )}
+
                 <img
                   src={userProfile.profilePicture || "/default-avatar.png"}
                   alt="Profile"
@@ -91,29 +160,33 @@ const Profile = () => {
                 </h2>
                 <p className="text-gray-600">@{userProfile.username}</p>
 
-                {/* Follow & Edit Profile Button */}
-                {currentUser._id === id ? (
-                  <button
-                    className="px-4 py-2 orange-gradient text-white rounded-full font-semibold hover:scale-105 transition"
-                    onClick={() => setOpen(true)}
-                  >
-                    Edit Profile
-                  </button>
-                ) : currentUser.following.includes(id) ? (
-                  <button
-                    className="px-4 py-2 bg-gray-500 text-white rounded-full font-semibold hover:bg-gray-600 transition"
-                    onClick={handleFollow}
-                  >
-                    Following
-                  </button>
-                ) : (
-                  <button
-                    className="px-4 py-2 orange-gradient text-white rounded-full font-semibold hover:scale-105 transition"
-                    onClick={handleFollow}
-                  >
-                    Follow
-                  </button>
+                {/* Biography */}
+                {userProfile.biography && (
+                  <p className="text-gray-700 max-w-md leading-relaxed">
+                    {userProfile.biography}
+                  </p>
                 )}
+
+                {/* Follow Stats */}
+                <div className="flex gap-6 text-sm text-gray-600">
+                  <span className="flex flex-col">
+                    <span className="font-semibold text-gray-800">{userProfile.following?.length || 0}</span>
+                    <span>Following</span>
+                  </span>
+                  <span className="flex flex-col">
+                    <span className="font-semibold text-gray-800">{userProfile.followers?.length || 0}</span>
+                    <span>Followers</span>
+                  </span>
+                </div>
+
+                {/* Follow & Edit Profile Button */}
+                <button
+                  className={followButtonProps.className}
+                  onClick={followButtonProps.onClick}
+                  disabled={!followButtonProps.onClick}
+                >
+                  {followButtonProps.text}
+                </button>
               </div>
             )}
 

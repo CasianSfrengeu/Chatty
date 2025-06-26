@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 import HomeIcon from "@mui/icons-material/Home";
@@ -6,21 +6,26 @@ import TagIcon from "@mui/icons-material/Tag";
 import PersonIcon from "@mui/icons-material/Person";
 import LogoutIcon from "@mui/icons-material/Logout";
 import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutline";
+import NotificationsIcon from "@mui/icons-material/Notifications";
 
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../../redux/userSlice";
+import FollowRequests from "../FollowRequests/FollowRequests";
 
 const LeftSidebar = () => {
   // getting the current logged-in user from the Redux store
   const { currentUser } = useSelector((state) => state.user);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const [showFollowRequests, setShowFollowRequests] = useState(false);
   
   // handling the logout action
   const handleLogout = () => {
     dispatch(logout()); //dispatch logout action from Redux
     navigate("/signin"); //navigate to signin page
   };
+
+  const hasPendingRequests = currentUser?.pendingFollowers?.length > 0;
 
   return (
     <>
@@ -57,6 +62,22 @@ const LeftSidebar = () => {
               <span className="hidden md:inline text-gray-700 font-semibold group-hover:text-orange-600">Profile</span>
             </div>
           </Link>
+          
+          {/* Follow Requests Button */}
+          {hasPendingRequests && (
+            <button
+              onClick={() => setShowFollowRequests(true)}
+              className="flex flex-col md:flex-row items-center gap-2 md:gap-4 px-2 py-3 rounded-2xl cursor-pointer hover:bg-orange-50 transition group relative"
+            >
+              <div className="relative">
+                <NotificationsIcon className="text-orange-500" fontSize="large" />
+                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                  {currentUser.pendingFollowers.length}
+                </span>
+              </div>
+              <span className="hidden md:inline text-gray-700 font-semibold group-hover:text-orange-600">Requests</span>
+            </button>
+          )}
         </nav>
         <div className="flex flex-col items-center md:items-stretch gap-4 mt-8">
           <div className="flex flex-col items-center md:flex-row md:items-center gap-2 mb-2">
@@ -104,6 +125,20 @@ const LeftSidebar = () => {
             <span className="text-xs">Profile</span>
           </button>
         </Link>
+        {hasPendingRequests && (
+          <button
+            onClick={() => setShowFollowRequests(true)}
+            className="flex flex-col items-center text-orange-500 hover:text-orange-600 transition relative"
+          >
+            <div className="relative">
+              <NotificationsIcon fontSize="medium" />
+              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
+                {currentUser.pendingFollowers.length}
+              </span>
+            </div>
+            <span className="text-xs">Requests</span>
+          </button>
+        )}
         <button
           className="flex flex-col items-center text-red-500 hover:text-red-600 transition"
           onClick={handleLogout}
@@ -113,6 +148,12 @@ const LeftSidebar = () => {
           <span className="text-xs">Logout</span>
         </button>
       </nav>
+
+      {/* Follow Requests Modal */}
+      <FollowRequests 
+        isOpen={showFollowRequests} 
+        onClose={() => setShowFollowRequests(false)} 
+      />
     </>
   );
 };

@@ -68,6 +68,25 @@ export const userSlice = createSlice({
         state.currentUser.following.push(action.payload);
       }
     },
+
+    // Add follow request to pending followers
+    addFollowRequest: (state, action) => {
+      if (!state.currentUser.pendingFollowers.includes(action.payload)) {
+        state.currentUser.pendingFollowers.push(action.payload);
+      }
+    },
+
+    // Remove follow request from pending followers (when accepted/rejected)
+    removeFollowRequest: (state, action) => {
+      state.currentUser.pendingFollowers = state.currentUser.pendingFollowers.filter(
+        (id) => id !== action.payload
+      );
+    },
+
+    // Update pending followers array
+    updatePendingFollowers: (state, action) => {
+      state.currentUser.pendingFollowers = action.payload;
+    },
   },
 });
 
@@ -80,6 +99,9 @@ export const {
   logout,
   changeProfile,
   following,
+  addFollowRequest,
+  removeFollowRequest,
+  updatePendingFollowers,
 } = userSlice.actions;
 
 export default userSlice.reducer;

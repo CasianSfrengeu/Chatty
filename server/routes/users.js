@@ -4,7 +4,7 @@ import express from "express";
 // importing multer (middleware for handling file uploads)
 import multer from "multer";
 import path from "path";
-import { getUser, update, deleteUser, follow, unFollow } from "../controllers/user.js";
+import { getUser, update, deleteUser, follow, unFollow, requestFollow, respondToFollowRequest } from "../controllers/user.js";
 import { verifyToken } from "../verifyToken.js";
 import { getUserByUsername } from "../controllers/user.js";
 import User from "../models/User.js";
@@ -63,5 +63,9 @@ router.delete("/:id", verifyToken, deleteUser);
 router.put("/follow/:id", verifyToken, follow);
 router.put("/unfollow/:id", verifyToken, unFollow);
 router.get("/username/:username", getUserByUsername);
+
+// new routes for privacy settings
+router.put("/request-follow/:id", verifyToken, requestFollow);
+router.put("/respond-follow-request/:id", verifyToken, respondToFollowRequest);
 
 export default router;

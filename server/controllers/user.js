@@ -50,6 +50,75 @@ export const update = async (req, res, next) => {
   }
 };
 
+// New function to handle follow requests for private accounts
+export const requestFollow = async (req, res, next) => {
+  try {
+    const userToFollow = await User.findById(req.params.id);
+    const currentUser = await User.findById(req.body.id);
+
+    if (!userToFollow) {
+      return res.status(404).json("User not found");
+    }
+
+    // If user is private, add to pending followers
+    if (userToFollow.isPrivate) {
+      if (!userToFollow.pendingFollowers.includes(req.body.id)) {
+        await userToFollow.updateOne({
+          $push: { pendingFollowers: req.body.id },
+        });
+        res.status(200).json("Follow request sent");
+      } else {
+        res.status(403).json("Follow request already sent");
+      }
+    } else {
+      // If public, follow directly
+      if (!userToFollow.followers.includes(req.body.id)) {
+        await userToFollow.updateOne({
+          $push: { followers: req.body.id },
+        });
+        await currentUser.updateOne({ $push: { following: req.params.id } });
+        res.status(200).json("Following the user");
+      } else {
+        res.status(403).json("You already follow this user");
+      }
+    }
+  } catch (err) {
+    next(err);
+  }
+};
+
+// New function to handle follow request responses
+export const respondToFollowRequest = async (req, res, next) => {
+  try {
+    const { action } = req.body; // 'accept' or 'reject'
+    const currentUser = await User.findById(req.params.id);
+    const requestingUser = await User.findById(req.body.requestingUserId);
+
+    if (!currentUser.pendingFollowers.includes(req.body.requestingUserId)) {
+      return res.status(404).json("No pending follow request found");
+    }
+
+    // Remove from pending followers
+    await currentUser.updateOne({
+      $pull: { pendingFollowers: req.body.requestingUserId },
+    });
+
+    if (action === 'accept') {
+      // Add to followers and following
+      await currentUser.updateOne({
+        $push: { followers: req.body.requestingUserId },
+      });
+      await requestingUser.updateOne({
+        $push: { following: req.params.id },
+      });
+      res.status(200).json("Follow request accepted");
+    } else {
+      res.status(200).json("Follow request rejected");
+    }
+  } catch (err) {
+    next(err);
+  }
+};
 
 export const deleteUser = async (req, res, next) => {
   // checking if the user is authorized

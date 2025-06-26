@@ -22,6 +22,11 @@ const UserSchema = new mongoose.Schema(
     description: { type: String },
     // profile picture as a string
     profilePicture: { type: String },
+    // new fields for profile customization
+    biography: { type: String, maxlength: 500 },
+    backgroundColor: { type: String, default: "#FF6B35" }, // default orange
+    isPrivate: { type: Boolean, default: false }, // false = public, true = private
+    pendingFollowers: { type: Array, defaultValue: [] }, // for private accounts
   },
   { timestamps: true }
 );
