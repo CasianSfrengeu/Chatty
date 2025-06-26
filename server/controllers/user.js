@@ -94,7 +94,16 @@ export const respondToFollowRequest = async (req, res, next) => {
     const currentUser = await User.findById(req.params.id);
     const requestingUser = await User.findById(req.body.requestingUserId);
 
-    if (!currentUser.pendingFollowers.includes(req.body.requestingUserId)) {
+    if (!currentUser) {
+      return res.status(404).json("Current user not found");
+    }
+
+    if (!requestingUser) {
+      return res.status(404).json("Requesting user not found");
+    }
+
+    // Check if the requesting user is in the current user's pending followers
+    if (!currentUser.pendingFollowers || !currentUser.pendingFollowers.includes(req.body.requestingUserId)) {
       return res.status(404).json("No pending follow request found");
     }
 
