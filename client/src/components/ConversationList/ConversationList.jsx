@@ -67,7 +67,7 @@ const ConversationList = ({ currentUserId, setSelectedConversation }) => {
   }, [currentUserId]);
 
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex flex-col gap-3">
       {Array.isArray(conversations) && conversations.length > 0 ? (
         conversations.map((conv) => {
           const otherUserId = conv.members.find((id) => id !== currentUserId);
@@ -77,34 +77,43 @@ const ConversationList = ({ currentUserId, setSelectedConversation }) => {
             <button
               key={conv._id}
               onClick={() => setSelectedConversation(conv)}
-              className="flex items-center gap-3 px-4 py-3 rounded-2xl bg-white shadow-sm hover:bg-orange-50 transition cursor-pointer border border-transparent focus:outline-none focus:ring-2 focus:ring-orange-300"
-              style={{ minHeight: 64 }}
+              className="group flex items-center gap-4 p-4 rounded-2xl bg-white/70 hover:bg-white/90 transition-all duration-300 cursor-pointer border border-transparent hover:border-orange-200/50 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-orange-300/50 transform hover:scale-[1.02]"
+              style={{ minHeight: 72 }}
             >
-              <img
-                src={info.profilePicture || "/default-avatar.png"}
-                alt="avatar"
-                className="w-12 h-12 rounded-full object-cover border-2 border-orange-100 shadow"
-              />
+              <div className="relative">
+                <img
+                  src={info.profilePicture || "/default-avatar.png"}
+                  alt="avatar"
+                  className="w-14 h-14 rounded-full object-cover border-3 border-orange-100 shadow-md group-hover:border-orange-200 transition-colors"
+                />
+                <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 border-2 border-white rounded-full"></div>
+              </div>
               <div className="flex-1 flex flex-col items-start min-w-0">
-                <span className="font-semibold text-base text-orange-700 truncate">
-                  {info.username || "User"}
-                </span>
-                <span className="text-xs text-gray-500 truncate max-w-full">
+                <div className="flex items-center gap-2 w-full">
+                  <span className="font-semibold text-base text-gray-800 truncate group-hover:text-orange-600 transition-colors">
+                    {info.username || "User"}
+                  </span>
+                  <span className="text-xs text-gray-400">•</span>
+                  <span className="text-xs text-gray-400">now</span>
+                </div>
+                <span className="text-sm text-gray-600 truncate max-w-full group-hover:text-gray-700 transition-colors">
                   {lastMsg ?
-                    (lastMsg.isSharedPost ? "[Shared a post]" : lastMsg.text) :
+                    (lastMsg.isSharedPost ? "📤 Shared a post" : lastMsg.text) :
                     info.biography || "No messages yet"
                   }
                 </span>
               </div>
               {/* Unread badge placeholder (future) */}
-              {/* <span className="ml-2 bg-orange-500 text-white text-xs rounded-full px-2 py-1">2</span> */}
+              {/* <span className="ml-2 bg-orange-500 text-white text-xs rounded-full px-2 py-1 min-w-[20px] h-5 flex items-center justify-center">2</span> */}
             </button>
           );
         })
       ) : (
-        <p className="text-gray-500 text-center py-4">
-          No conversations yet. Start a new one!
-        </p>
+        <div className="flex flex-col items-center justify-center py-12 text-center">
+          <div className="text-4xl mb-3">💭</div>
+          <p className="text-gray-500 font-medium mb-1">No conversations yet</p>
+          <p className="text-gray-400 text-sm">Start a new conversation to begin chatting!</p>
+        </div>
       )}
     </div>
   );

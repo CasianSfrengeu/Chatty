@@ -4,26 +4,30 @@ import api from "../../api";
 const NewConversation = ({ currentUserId, onConversationCreated }) => {
   const [usernameInput, setUsernameInput] = useState("");
   const [feedback, setFeedback] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleCreateConversation = async (e) => {
     e.preventDefault();
 
     if (!usernameInput.trim()) {
-      setFeedback("Introduceți un nume de utilizator.");
+      setFeedback("Please enter a username.");
       return;
     }
 
+    setIsLoading(true);
+    setFeedback("");
+
     try {
-      // Pasul 1: Caută userul după username
+      // Step 1: Find user by username
       const resUser = await api.get(`/users/username/${usernameInput}`);
       const receiver = resUser.data;
 
       if (receiver._id === currentUserId) {
-        setFeedback("Nu poți începe o conversație cu tine.");
+        setFeedback("You cannot start a conversation with yourself.");
         return;
       }
 
-      // Pasul 2: Verifică dacă există deja o conversație
+      // Step 2: Check if conversation already exists
       const resConv = await api.get(`/conversations/${currentUserId}`);
       const conversations = Array.isArray(resConv.data) ? resConv.data : [];
       const alreadyExists = conversations.some((conv) =>
@@ -31,50 +35,82 @@ const NewConversation = ({ currentUserId, onConversationCreated }) => {
       );
 
       if (alreadyExists) {
-        setFeedback("Conversația deja există.");
+        setFeedback("Conversation already exists.");
         return;
       }
 
-      // ✅ Pasul 3: Creează conversația
+      // Step 3: Create conversation
       await api.post("/conversations", {
         senderId: currentUserId,
         receiverId: receiver._id,
       });
 
-      // 👇 Mutat AICI pentru a forța refreshul conversațiilor
+      // Trigger refresh
       if (onConversationCreated) onConversationCreated();
 
-      setFeedback("Conversația a fost creată!");
+      setFeedback("Conversation created successfully!");
       setUsernameInput("");
 
     } catch (err) {
-      console.log("Eroare:", err);
-      setFeedback("Utilizatorul nu a fost găsit sau a apărut o eroare.");
+      console.log("Error:", err);
+      setFeedback("User not found or an error occurred.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
-    <div className="p-4">
-      <h3 className="text-lg font-semibold text-orange-600 mb-3">
-        New Conversation
-      </h3>
+    <div className="space-y-4">
+      <div className="flex items-center gap-3">
+        <div className="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center">
+          <span className="text-orange-600 text-sm font-bold">+</span>
+        </div>
+        <h3 className="text-lg font-semibold text-gray-800">
+          New Conversation
+        </h3>
+      </div>
+      
       <form onSubmit={handleCreateConversation} className="space-y-3">
-        <input
-          type="text"
-          placeholder="Enter username..."
-          value={usernameInput}
-          onChange={(e) => setUsernameInput(e.target.value)}
-          className="w-full p-2 border border-orange-300 rounded focus:outline-none focus:ring-2 focus:ring-orange-500"
-        />
+        <div className="relative">
+          <input
+            type="text"
+            placeholder="Enter username..."
+            value={usernameInput}
+            onChange={(e) => setUsernameInput(e.target.value)}
+            className="w-full px-4 py-3 border border-orange-200/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-orange-400 bg-white/80 backdrop-blur-sm transition-all"
+            disabled={isLoading}
+          />
+          <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+            </svg>
+          </div>
+        </div>
+        
         <button
           type="submit"
-          className="w-full bg-orange-500 text-white py-2 rounded hover:bg-orange-600 transition"
+          disabled={isLoading || !usernameInput.trim()}
+          className="w-full bg-gradient-to-r from-orange-500 to-orange-600 text-white py-3 rounded-xl font-semibold hover:from-orange-600 hover:to-orange-700 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-orange-400"
         >
-          Start Conversation
+          {isLoading ? (
+            <div className="flex items-center justify-center gap-2">
+              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+              Creating...
+            </div>
+          ) : (
+            "Start Conversation"
+          )}
         </button>
       </form>
+      
       {feedback && (
-        <p className="mt-2 text-sm text-orange-600">{feedback}</p>
+        <div className={`p-3 rounded-xl text-sm font-medium ${
+          feedback.includes('Error') || feedback.includes('not found') || feedback.includes('already exists') || feedback.includes('cannot start')
+            ? 'bg-red-100 text-red-700 border border-red-200'
+            : 'bg-green-100 text-green-700 border border-green-200'
+        }`}>
+          {feedback}
+        </div>
       )}
     </div>
   );
