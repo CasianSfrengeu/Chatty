@@ -163,8 +163,12 @@ const MessageBox = ({ conversation }) => {
 
   if (!conversation) {
     return (
-      <div className="flex items-center justify-center h-full text-gray-400 text-lg">
-        Select a conversation to start chatting.
+      <div className="flex flex-1 flex-col items-center justify-center text-gray-400 p-8 select-none">
+        <div className="text-[90px] mb-6 opacity-70">💬</div>
+        <h3 className="text-2xl font-bold text-gray-500 mb-2">No conversation selected</h3>
+        <p className="text-gray-400 text-center max-w-md text-lg">
+          Choose a conversation from the sidebar to start chatting with your friends
+        </p>
       </div>
     );
   }

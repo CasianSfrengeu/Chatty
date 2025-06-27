@@ -36,11 +36,11 @@ const LeftSidebar = () => {
       >
         <nav className="flex flex-col gap-4 md:gap-6">
           <h2 className="hidden md:block text-2xl font-extrabold text-orange-500 text-center mb-2 tracking-tight select-none">
-            Chatty
-          </h2>
-          <Link to="/">
+          Chatty
+        </h2>
+        <Link to="/">
             <div className="flex flex-col md:flex-row items-center gap-2 md:gap-4 px-2 py-3 rounded-2xl cursor-pointer hover:bg-orange-50 transition group">
-              <HomeIcon className="text-orange-500" fontSize="large" />
+            <HomeIcon className="text-orange-500" fontSize="large" />
               <span className="hidden md:inline text-gray-700 font-semibold group-hover:text-orange-600">Home</span>
             </div>
           </Link>

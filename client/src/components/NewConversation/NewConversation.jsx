@@ -60,7 +60,7 @@ const NewConversation = ({ currentUserId, onConversationCreated }) => {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 mb-2">
       <div className="flex items-center gap-3">
         <div className="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center">
           <span className="text-orange-600 text-sm font-bold">+</span>
