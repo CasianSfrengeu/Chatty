@@ -27,16 +27,15 @@ const Chat = () => {
             />
             <span className="font-bold text-xl text-orange-500 tracking-tight">Chats</span>
           </div>
-          <button className="text-orange-400 hover:text-orange-600 text-2xl transition" title="Settings">
-            <i className="fas fa-cog"></i>
-          </button>
         </div>
-        {/* New Conversation */}
-        <div className="px-6 py-3 border-b border-orange-100 bg-white">
-          <NewConversation
-            currentUserId={currentUser._id}
-            onConversationCreated={handleConversationCreated}
-          />
+        {/* New Conversation Input+Button as a single card */}
+        <div className="px-4 py-4 border-b border-orange-100 bg-white">
+          <div className="bg-orange-50 rounded-xl p-3 flex flex-col gap-2 shadow-sm">
+            <NewConversation
+              currentUserId={currentUser._id}
+              onConversationCreated={handleConversationCreated}
+            />
+          </div>
         </div>
         {/* Conversation List - scrollable, fills rest of sidebar */}
         <div className="flex-1 min-h-0 overflow-y-auto bg-white custom-scrollbar px-0 py-2">
@@ -49,10 +48,16 @@ const Chat = () => {
       </aside>
       {/* Chat Window */}
       <main className="flex-1 flex flex-col h-full min-w-0">
-        <MessageBox
-          currentUser={currentUser}
-          conversation={selectedConversation}
-        />
+        {selectedConversation ? (
+          <MessageBox
+            currentUser={currentUser}
+            conversation={selectedConversation}
+          />
+        ) : (
+          <div className="flex-1 flex items-center justify-center text-gray-400 text-xl">
+            Select a conversation to start chatting.
+          </div>
+        )}
       </main>
     </div>
   );
