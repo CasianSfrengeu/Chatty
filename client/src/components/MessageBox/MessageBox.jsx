@@ -200,12 +200,6 @@ const MessageBox = ({ conversation }) => {
       {/* Messages */}
       <div className="flex-1 overflow-y-auto px-6 py-6 space-y-4 bg-gradient-to-br from-orange-50/30 to-white custom-scrollbar">
         {Array.isArray(messages) && messages.map((msg, index) => {
-          const userReaction = (msg.reactions || []).find(r => r.userId === currentUser._id);
-          // Group reactions by emoji
-          const reactionGroups = (msg.reactions || []).reduce((acc, r) => {
-            acc[r.emoji] = acc[r.emoji] ? acc[r.emoji] + 1 : 1;
-            return acc;
-          }, {});
           const isMine = msg.sender === currentUser._id;
           return (
             <div
@@ -255,61 +249,6 @@ const MessageBox = ({ conversation }) => {
                 ) : (
                   <span className="leading-relaxed">{msg.text}</span>
                 )}
-                
-                {/* Emoji reactions */}
-                <div className="flex items-center gap-2 mt-2">
-                  <button
-                    type="button"
-                    className={`text-lg px-2 py-1 rounded-full focus:outline-none transition-colors ${
-                      isMine 
-                        ? 'hover:bg-orange-400/30' 
-                        : 'hover:bg-orange-100'
-                    }`}
-                    onClick={() => setShowEmojiPicker(showEmojiPicker === msg._id ? null : msg._id)}
-                    title={userReaction ? `Your reaction: ${userReaction.emoji}` : "Add reaction"}
-                  >
-                    {userReaction ? userReaction.emoji : "😊"}
-                  </button>
-                  
-                  {/* Emoji picker popover */}
-                  {showEmojiPicker === msg._id && (
-                    <div className="absolute z-50 bg-white border border-orange-200 rounded-2xl shadow-xl p-3 flex gap-2 mt-8">
-                      {EMOJI_OPTIONS.map((emoji) => (
-                        <button
-                          key={emoji}
-                          className="text-xl hover:scale-125 transition-transform p-1 rounded-full hover:bg-orange-50"
-                          onClick={() => handleAddReaction(msg._id, emoji)}
-                        >
-                          {emoji}
-                        </button>
-                      ))}
-                      {userReaction && (
-                        <button
-                          className="text-xs text-red-500 ml-2 px-2 py-1 rounded-full hover:bg-red-50"
-                          onClick={() => handleRemoveReaction(msg._id)}
-                        >
-                          Remove
-                        </button>
-                      )}
-                    </div>
-                  )}
-                  
-                  {/* Reactions display */}
-                  {Object.keys(reactionGroups).length > 0 && (
-                    <div className="flex gap-2 ml-2">
-                      {Object.entries(reactionGroups).map(([emoji, count]) => (
-                        <span key={emoji} className={`px-2 py-1 rounded-full text-sm flex items-center gap-1 ${
-                          isMine 
-                            ? 'bg-orange-400/30 text-orange-100' 
-                            : 'bg-orange-100 text-orange-700'
-                        }`}>
-                          {emoji} <span className="text-xs font-bold">{count}</span>
-                        </span>
-                      ))}
-                    </div>
-                  )}
-                </div>
-                
                 <span className={`text-[11px] block mt-1 text-right ${
                   isMine ? 'text-orange-100' : 'text-gray-400'
                 }`}>
