@@ -56,6 +56,26 @@ router.put("/:id/profile", verifyToken, upload.single("image"), async (req, res)
   }
 });
 
+// Get user's followers
+router.get("/followers/:userId", verifyToken, async (req, res) => {
+  try {
+    const user = await User.findById(req.params.userId);
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    // Get all users who are following this user
+    const followers = await User.find({
+      _id: { $in: user.followers }
+    }).select('_id username profilePicture biography');
+
+    res.status(200).json(followers);
+  } catch (err) {
+    console.error("Error fetching followers:", err);
+    res.status(500).json({ error: "Error fetching followers" });
+  }
+});
+
 // Specific routes first (before generic :id route)
 router.get("/find/:id", getUser);
 router.get("/username/:username", getUserByUsername);
