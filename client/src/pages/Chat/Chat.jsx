@@ -16,7 +16,7 @@ const Chat = () => {
   return (
     <div className="flex h-[calc(100vh-60px)] mt-[60px] bg-gradient-to-tr from-orange-50 to-white">
       {/* Sidebar */}
-      <aside className="w-[350px] min-w-[280px] max-w-[400px] h-full bg-white border-r border-orange-200 flex flex-col shadow-lg">
+      <aside className="flex flex-col w-[340px] min-w-[260px] max-w-[400px] h-full bg-white border-r border-orange-200 shadow-lg">
         {/* Sidebar Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-orange-100 bg-white sticky top-0 z-10">
           <div className="flex items-center gap-3">
@@ -31,15 +31,15 @@ const Chat = () => {
             <i className="fas fa-cog"></i>
           </button>
         </div>
-        {/* New Conversation (FAB style on desktop) */}
-        <div className="px-6 py-3 border-b border-orange-100">
+        {/* New Conversation */}
+        <div className="px-6 py-3 border-b border-orange-100 bg-white">
           <NewConversation
             currentUserId={currentUser._id}
             onConversationCreated={handleConversationCreated}
           />
         </div>
-        {/* Conversation List */}
-        <div className="flex-1 overflow-y-auto custom-scrollbar px-2 py-2">
+        {/* Conversation List - scrollable, fills rest of sidebar */}
+        <div className="flex-1 min-h-0 overflow-y-auto bg-white custom-scrollbar px-0 py-2">
           <Conversations
             currentUserId={currentUser._id}
             setSelectedConversation={setSelectedConversation}
@@ -48,7 +48,7 @@ const Chat = () => {
         </div>
       </aside>
       {/* Chat Window */}
-      <main className="flex-1 flex flex-col h-full">
+      <main className="flex-1 flex flex-col h-full min-w-0">
         <MessageBox
           currentUser={currentUser}
           conversation={selectedConversation}
