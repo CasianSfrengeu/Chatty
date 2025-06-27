@@ -9,15 +9,18 @@ import { useSelector } from "react-redux";
 
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import FavoriteIcon from "@mui/icons-material/Favorite";
+import ShareIcon from "@mui/icons-material/Share";
 
 // 🔽 Comentarii
 import CommentList from "../CommentList";
 import AddComment from "../AddComment";
+import SharePostModal from "../SharePostModal/SharePostModal";
 
 const Tweet = ({ tweet, setData }) => {
   const { currentUser } = useSelector((state) => state.user);
   const [userData, setUserData] = useState();
   const [refreshComments, setRefreshComments] = useState(false);
+  const [showShareModal, setShowShareModal] = useState(false);
 
   const dateStr = formatDistance(new Date(tweet.createdAt), new Date());
   const location = useLocation().pathname;
@@ -104,6 +107,15 @@ const Tweet = ({ tweet, setData }) => {
         <span className="text-gray-500 text-sm">
           {tweet.comments?.length || 0} Comments
         </span>
+        <span className="text-gray-400 text-sm">•</span>
+        <button
+          className="flex items-center gap-1 hover:text-orange-600 transition"
+          onClick={() => setShowShareModal(true)}
+          title="Share post"
+        >
+          <ShareIcon fontSize="small" />
+          <span className="text-sm font-semibold">Share</span>
+        </button>
       </div>
 
       {/* Comments Section */}
@@ -111,6 +123,14 @@ const Tweet = ({ tweet, setData }) => {
         <AddComment postId={tweet._id} onCommentAdded={() => setRefreshComments(!refreshComments)} />
         <CommentList postId={tweet._id} key={refreshComments} />
       </div>
+
+      {/* Share Post Modal */}
+      <SharePostModal
+        isOpen={showShareModal}
+        onClose={() => setShowShareModal(false)}
+        postId={tweet._id}
+        postDescription={tweet.description}
+      />
     </div>
   );
 };
