@@ -74,9 +74,13 @@ const Tweet = ({ tweet, setData }) => {
           className="w-10 h-10 rounded-full border-2 border-orange-200 object-cover shadow-sm"
         />
         <div className="flex flex-col">
-          <span className="font-semibold text-orange-500 text-base leading-tight">
+          <Link
+            to={`/profile/${userData?._id}`}
+            className="font-semibold text-orange-500 text-base leading-tight hover:underline focus:underline outline-none"
+            tabIndex={0}
+          >
             {userData?.username || "User"}
-          </span>
+          </Link>
           <span className="text-xs text-gray-400 font-medium">
             {dateStr} ago
           </span>

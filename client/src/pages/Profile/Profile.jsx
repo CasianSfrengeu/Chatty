@@ -3,7 +3,7 @@ import LeftSidebar from "../../components/LeftSidebar/LeftSidebar";
 import RightSidebar from "../../components/RightSidebar/RightSidebar";
 import EditProfile from "../../components/EditProfile/EditProfile";
 
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import api from "../../api";
 import Tweet from "../../components/Tweet/Tweet";
@@ -28,6 +28,7 @@ const Profile = () => {
 
   const { id } = useParams(); // extracting the user id
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   // fetching the user profile and tweets with GET requests
   useEffect(() => {
@@ -78,6 +79,12 @@ const Profile = () => {
     } catch (err) {
       console.log("error", err);
     }
+  };
+
+  // Message button handler
+  const handleMessage = async () => {
+    // Optionally, you could create the conversation here if it doesn't exist
+    navigate("/chat", { state: { userId: userProfile._id, username: userProfile.username } });
   };
 
   // Get follow button text and styling
@@ -180,13 +187,24 @@ const Profile = () => {
                 </div>
 
                 {/* Follow & Edit Profile Button */}
-                <button
-                  className={followButtonProps.className}
-                  onClick={followButtonProps.onClick}
-                  disabled={!followButtonProps.onClick}
-                >
-                  {followButtonProps.text}
-                </button>
+                <div className="flex gap-3 justify-center">
+                  <button
+                    className={followButtonProps.className}
+                    onClick={followButtonProps.onClick}
+                    disabled={!followButtonProps.onClick}
+                  >
+                    {followButtonProps.text}
+                  </button>
+                  {/* Message Button: only show if not own profile */}
+                  {!isOwnProfile && (
+                    <button
+                      className="px-4 py-2 bg-orange-100 text-orange-600 rounded-full font-semibold hover:bg-orange-200 transition border border-orange-200"
+                      onClick={handleMessage}
+                    >
+                      Message
+                    </button>
+                  )}
+                </div>
               </div>
             )}
 

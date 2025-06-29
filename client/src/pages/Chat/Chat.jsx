@@ -1,8 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Conversations from "../../components/Conversations/Conversations";
 import MessageBox from "../../components/MessageBox/MessageBox";
 import NewConversation from "../../components/NewConversation/NewConversation";
 import { useSelector } from "react-redux";
+import { useLocation } from "react-router-dom";
+import api from "../../api";
 
 const SIDEBAR_WIDTH = "340px";
 
@@ -10,10 +12,43 @@ const Chat = () => {
   const { currentUser } = useSelector((state) => state.user);
   const [selectedConversation, setSelectedConversation] = useState(null);
   const [refresh, setRefresh] = useState(false);
+  const location = useLocation();
 
   const handleConversationCreated = () => {
     setRefresh((prev) => !prev);
   };
+
+  // Auto-open conversation if userId is provided in navigation state
+  useEffect(() => {
+    const openConversation = async () => {
+      const userIdToChat = location.state?.userId;
+      if (!userIdToChat || !currentUser?._id) return;
+      try {
+        // Fetch all conversations
+        const res = await api.get(`/conversations/${currentUser._id}`);
+        const conversations = Array.isArray(res.data) ? res.data : [];
+        // Try to find an existing conversation
+        let conversation = conversations.find(conv =>
+          conv.members.includes(userIdToChat) && conv.members.includes(currentUser._id)
+        );
+        // If not found, create it
+        if (!conversation) {
+          const createRes = await api.post("/conversations", {
+            senderId: currentUser._id,
+            receiverId: userIdToChat,
+          });
+          conversation = createRes.data;
+          setRefresh(r => !r); // Refresh the list
+        }
+        setSelectedConversation(conversation);
+      } catch (err) {
+        // Optionally handle error
+      }
+    };
+    openConversation();
+    // Only run on mount or when location.state.userId changes
+    // eslint-disable-next-line
+  }, [location.state?.userId, currentUser?._id]);
 
   return (
     <div className="flex h-[calc(100vh-60px)] mt-[60px] bg-gradient-to-br from-orange-50 via-white to-orange-50 overflow-hidden">
