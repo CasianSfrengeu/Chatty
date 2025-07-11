@@ -64,6 +64,19 @@ app.use("/api/conversations", conversationRoutes);
 app.use("/api/messages", messageRoutes);
 app.use("/api/comments", commentRoutes);
 
+// 404 handler for unknown API routes
+app.use((req, res, next) => {
+  if (req.path.startsWith('/api/')) {
+    return res.status(404).json({ message: "Resursa nu a fost găsită." });
+  }
+  next();
+});
+
+// Global error handler
+app.use((err, req, res, next) => {
+  res.status(err.status || 500).json({ message: err.message || "Eroare internă de server." });
+});
+
 // Creare server HTTP
 const server = http.createServer(app);
 
