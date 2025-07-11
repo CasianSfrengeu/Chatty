@@ -33,9 +33,12 @@ const Signin = () => {
       let msg = "Eroare la autentificare. Încearcă din nou.";
       if (err.response && err.response.data && err.response.data.message) {
         msg = err.response.data.message;
-      } else if (err.response && err.response.data) {
-        // backend may send string
-        msg = typeof err.response.data === 'string' ? err.response.data : msg;
+      } else if (err.response && typeof err.response.data === 'string') {
+        if (err.response.data.includes('<html')) {
+          msg = "Eroare de server. Încearcă mai târziu sau contactează administratorul.";
+        } else {
+          msg = err.response.data;
+        }
       }
       if (msg.includes("User not found")) msg = "Numele de utilizator nu există.";
       if (msg.includes("Wrong password")) msg = "Parolă incorectă.";
@@ -67,8 +70,12 @@ const Signin = () => {
       let msg = "Eroare la înregistrare. Încearcă din nou.";
       if (err.response && err.response.data && err.response.data.message) {
         msg = err.response.data.message;
-      } else if (err.response && err.response.data) {
-        msg = typeof err.response.data === 'string' ? err.response.data : msg;
+      } else if (err.response && typeof err.response.data === 'string') {
+        if (err.response.data.includes('<html')) {
+          msg = "Eroare de server. Încearcă mai târziu sau contactează administratorul.";
+        } else {
+          msg = err.response.data;
+        }
       }
       // MongoDB duplicate key error
       if (msg.includes("E11000 duplicate key error") && msg.includes("username")) msg = "Numele de utilizator este deja folosit.";
