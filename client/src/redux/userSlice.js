@@ -71,6 +71,9 @@ export const userSlice = createSlice({
 
     // Add follow request to pending followers
     addFollowRequest: (state, action) => {
+      if (!state.currentUser.pendingFollowers) {
+        state.currentUser.pendingFollowers = [];
+      }
       if (!state.currentUser.pendingFollowers.includes(action.payload)) {
         state.currentUser.pendingFollowers.push(action.payload);
       }

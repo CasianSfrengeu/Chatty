@@ -8,7 +8,7 @@ import { useSelector, useDispatch } from "react-redux";
 import api from "../../api";
 import Tweet from "../../components/Tweet/Tweet";
 
-import { following, addFollowRequest } from "../../redux/userSlice";
+import { following } from "../../redux/userSlice";
 
 /*
 
@@ -61,8 +61,6 @@ const Profile = () => {
         if (!hasRequestedFollow) {
           await api.put(`/users/request-follow/${id}`, { id: currentUser._id });
           setHasRequestedFollow(true);
-          // Update Redux state to add to pending followers
-          dispatch(addFollowRequest(currentUser._id));
         }
       } else {
         // Handle public account follow/unfollow

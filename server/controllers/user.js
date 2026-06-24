@@ -66,6 +66,16 @@ export const requestFollow = async (req, res, next) => {
         await userToFollow.updateOne({
           $push: { pendingFollowers: req.body.id },
         });
+
+        const io = req.app.get("io");
+        const socketUsers = req.app.get("socketUsers");
+        const targetSocketId = socketUsers?.get(String(req.params.id));
+        if (io && targetSocketId) {
+          io.to(targetSocketId).emit("followRequest", {
+            requestingUserId: req.body.id,
+          });
+        }
+
         res.status(200).json("Follow request sent");
       } else {
         res.status(403).json("Follow request already sent");

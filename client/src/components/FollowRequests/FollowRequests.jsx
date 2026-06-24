@@ -10,19 +10,24 @@ const FollowRequests = ({ isOpen, onClose }) => {
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    if (isOpen && currentUser?.pendingFollowers?.length > 0) {
+    if (isOpen && currentUser?._id) {
       fetchPendingFollowers();
     }
-  }, [isOpen, currentUser]);
+  }, [isOpen, currentUser?._id, currentUser?.pendingFollowers?.length]);
 
   const fetchPendingFollowers = async () => {
     try {
       setIsLoading(true);
-      const promises = currentUser.pendingFollowers.map(userId => 
+      const pendingIds = currentUser.pendingFollowers || [];
+      if (pendingIds.length === 0) {
+        setPendingFollowers([]);
+        return;
+      }
+      const promises = pendingIds.map((userId) =>
         api.get(`/users/find/${userId}`)
       );
       const responses = await Promise.all(promises);
-      setPendingFollowers(responses.map(res => res.data));
+      setPendingFollowers(responses.map((res) => res.data));
     } catch (error) {
       console.error("Error fetching pending followers:", error);
     } finally {

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 import HomeIcon from "@mui/icons-material/Home";
@@ -9,8 +9,10 @@ import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutline";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 
 import { useDispatch, useSelector } from "react-redux";
-import { logout } from "../../redux/userSlice";
+import { logout, addFollowRequest, updatePendingFollowers } from "../../redux/userSlice";
 import FollowRequests from "../FollowRequests/FollowRequests";
+import socket from "../../socket";
+import api from "../../api";
 
 const LeftSidebar = () => {
   // getting the current logged-in user from the Redux store
@@ -18,7 +20,33 @@ const LeftSidebar = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [showFollowRequests, setShowFollowRequests] = useState(false);
-  
+
+  useEffect(() => {
+    if (!currentUser?._id) return;
+
+    socket.emit("addUser", currentUser._id);
+
+    const syncPendingFollowers = async () => {
+      try {
+        const res = await api.get(`/users/find/${currentUser._id}`);
+        dispatch(updatePendingFollowers(res.data.pendingFollowers || []));
+      } catch (error) {
+        console.error("Error syncing follow requests:", error);
+      }
+    };
+
+    const handleFollowRequest = ({ requestingUserId }) => {
+      dispatch(addFollowRequest(requestingUserId));
+    };
+
+    syncPendingFollowers();
+    socket.on("followRequest", handleFollowRequest);
+
+    return () => {
+      socket.off("followRequest", handleFollowRequest);
+    };
+  }, [currentUser?._id, dispatch]);
+
   // handling the logout action
   const handleLogout = () => {
     dispatch(logout()); //dispatch logout action from Redux

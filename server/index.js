@@ -91,6 +91,8 @@ const io = new Server(server, {
 
 // Mapare userId -> socket.id
 const users = new Map();
+app.set("io", io);
+app.set("socketUsers", users);
 
 // Socket.io events
 io.on("connection", (socket) => {
