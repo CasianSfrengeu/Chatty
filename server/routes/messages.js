@@ -103,6 +103,18 @@ router.post("/share-post", verifyToken, async (req, res) => {
     });
 
     const savedMessage = await sharedMessage.save();
+
+    // Notify receiver via socket if online
+    const io = req.app.get("io");
+    const socketUsers = req.app.get("socketUsers");
+    const receiverSocketId = socketUsers?.get(String(receiverId));
+    if (io && receiverSocketId) {
+      io.to(receiverSocketId).emit("receiveMessage", {
+        ...savedMessage.toObject(),
+        receiverId,
+      });
+    }
+
     res.status(200).json(savedMessage);
   } catch (err) {
     res.status(500).json({ error: err.message });

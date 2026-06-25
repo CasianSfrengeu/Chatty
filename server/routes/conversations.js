@@ -4,19 +4,23 @@ import { verifyToken } from "../verifyToken.js";
 
 const router = express.Router();
 
-// Creează o conversație nouă între doi useri
+// Returnează conversația existentă sau creează una nouă
 router.post("/", verifyToken, async (req, res) => {
+  try {
+    const existing = await Conversation.findOne({
+      members: { $all: [req.body.senderId, req.body.receiverId], $size: 2 },
+    });
+    if (existing) return res.status(200).json(existing);
+
     const newConversation = new Conversation({
       members: [req.body.senderId, req.body.receiverId],
     });
-  
-    try {
-      const savedConversation = await newConversation.save();
-      res.status(200).json(savedConversation);
-    } catch (err) {
-      res.status(500).json(err);
-    }
-  });
+    const savedConversation = await newConversation.save();
+    res.status(200).json(savedConversation);
+  } catch (err) {
+    res.status(500).json(err);
+  }
+});
   
 
 // Returnează toate conversațiile în care userul este membru
