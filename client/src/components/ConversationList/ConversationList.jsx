@@ -95,10 +95,10 @@ const ConversationList = ({ currentUserId, setSelectedConversation }) => {
             >
               <div className="relative">
                 <img
-                  src={info.profilePicture ? info.profilePicture : "/default-avatar.png"}
+                  src={info.profilePicture ? info.profilePicture : "/default-avatar.svg"}
                   alt="avatar"
                   className="w-14 h-14 rounded-full object-cover border-3 border-orange-100 shadow-md group-hover:border-orange-200 transition-colors"
-                  onError={e => { e.target.onerror = null; e.target.src = "/default-avatar.png"; }}
+                  onError={e => { e.target.onerror = null; e.target.src = "/default-avatar.svg"; }}
                 />
                 <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 border-2 border-white rounded-full"></div>
               </div>

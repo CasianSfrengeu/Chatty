@@ -104,7 +104,7 @@ const SharePostModal = ({ isOpen, onClose, postId, postDescription }) => {
                   onClick={() => setSelectedUser(follower)}
                 >
                   <img
-                    src={follower.profilePicture || "/default-avatar.png"}
+                    src={follower.profilePicture || "/default-avatar.svg"}
                     alt="avatar"
                     className="w-10 h-10 rounded-full object-cover"
                   />

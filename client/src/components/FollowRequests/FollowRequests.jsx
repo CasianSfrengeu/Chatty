@@ -85,7 +85,7 @@ const FollowRequests = ({ isOpen, onClose }) => {
                 <div key={user._id} className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
                   <div className="flex items-center gap-3">
                     <img
-                      src={user.profilePicture || "/default-avatar.png"}
+                      src={user.profilePicture || "/default-avatar.svg"}
                       alt={user.username}
                       className="w-10 h-10 rounded-full object-cover"
                     />

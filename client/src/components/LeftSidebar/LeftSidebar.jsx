@@ -110,7 +110,7 @@ const LeftSidebar = () => {
         <div className="flex flex-col items-center md:items-stretch gap-4 mt-8">
           <div className="flex flex-col items-center md:flex-row md:items-center gap-2 mb-2">
             <img
-              src={currentUser?.profilePicture || "/default-avatar.png"}
+              src={currentUser?.profilePicture || "/default-avatar.svg"}
               alt="avatar"
               className="w-12 h-12 rounded-full border-2 border-orange-200 shadow-md object-cover"
             />

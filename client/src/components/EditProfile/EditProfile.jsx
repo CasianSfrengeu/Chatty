@@ -136,7 +136,7 @@ const EditProfile = ({ setOpen }) => {
           <div className="space-y-4">
             <div className="flex items-center gap-4">
               <img
-                src={currentUser?.profilePicture || "/default-avatar.png"}
+                src={currentUser?.profilePicture || "/default-avatar.svg"}
                 alt="Current Profile"
                 className="w-16 h-16 rounded-full border-2 border-orange-200 shadow-md object-cover"
               />

@@ -62,7 +62,7 @@ const Chat = () => {
           <div className="flex items-center gap-4">
             <div className="relative">
               <img
-                src={currentUser?.profilePicture || "/default-avatar.png"}
+                src={currentUser?.profilePicture || "/default-avatar.svg"}
                 alt="avatar"
                 className="w-12 h-12 rounded-full border-3 border-orange-200 object-cover shadow-lg"
               />

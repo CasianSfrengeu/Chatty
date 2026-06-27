@@ -29,7 +29,7 @@ const MainTweet = () => {
       <div className="card mb-8 relative">
         <div className="flex items-start gap-4">
           <img
-            src={currentUser?.profilePicture || "/default-avatar.png"}
+            src={currentUser?.profilePicture || "/default-avatar.svg"}
             alt="avatar"
             className="w-12 h-12 rounded-full border-2 border-orange-200 object-cover shadow"
           />

@@ -156,7 +156,7 @@ const Profile = () => {
                 )}
 
                 <img
-                  src={userProfile.profilePicture || "/default-avatar.png"}
+                  src={userProfile.profilePicture || "/default-avatar.svg"}
                   alt="Profile"
                   className="w-24 h-24 rounded-full border-4 border-orange-200 shadow-md object-cover"
                 />

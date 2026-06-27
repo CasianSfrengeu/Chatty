@@ -69,7 +69,7 @@ const Tweet = ({ tweet, setData }) => {
       {/* Header: Avatar, Username, Date */}
       <div className="flex items-center gap-3 mb-1">
         <img
-          src={userData?.profilePicture || "/default-avatar.png"}
+          src={userData?.profilePicture || "/default-avatar.svg"}
           alt="avatar"
           className="w-10 h-10 rounded-full border-2 border-orange-200 object-cover shadow-sm"
         />

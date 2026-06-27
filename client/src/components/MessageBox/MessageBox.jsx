@@ -222,7 +222,7 @@ const MessageBox = ({ conversation }) => {
       <div className="sticky top-0 z-10 flex items-center gap-4 px-6 py-5 bg-white/90 backdrop-blur-sm border-b border-orange-100/50 shadow-sm">
         <Link to={`/profile/${otherUserId}`} className="relative shrink-0 group/avatar">
           <img
-            src={receiverProfile.profilePicture || "/default-avatar.png"}
+            src={receiverProfile.profilePicture || "/default-avatar.svg"}
             alt="avatar"
             className="w-14 h-14 rounded-full object-cover border-3 border-orange-200 shadow-md group-hover/avatar:border-orange-400 transition-colors"
           />
@@ -329,7 +329,7 @@ const MessageBox = ({ conversation }) => {
                           <img
                             src={
                               msg.sharedPost.userProfilePicture ||
-                              "/default-avatar.png"
+                              "/default-avatar.svg"
                             }
                             alt="avatar"
                             className="w-7 h-7 rounded-full object-cover border border-orange-200"
