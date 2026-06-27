@@ -12,7 +12,6 @@ const ConversationList = ({ currentUserId, setSelectedConversation }) => {
       try {
         const res = await api.get(`/conversations/${currentUserId}`);
         const conversationsData = Array.isArray(res.data) ? res.data : [];
-        setConversations(conversationsData);
 
         if (conversationsData.length > 0) {
           // Get other user IDs
@@ -56,6 +55,20 @@ const ConversationList = ({ currentUserId, setSelectedConversation }) => {
             })
           );
           setLastMessages(lastMsgMap);
+
+          // Sort by most recent activity: last message date, fallback to conversation updatedAt/createdAt
+          const sorted = [...conversationsData].sort((a, b) => {
+            const aTime = lastMsgMap[a._id]?.createdAt
+              ? new Date(lastMsgMap[a._id].createdAt).getTime()
+              : new Date(a.updatedAt || a.createdAt).getTime();
+            const bTime = lastMsgMap[b._id]?.createdAt
+              ? new Date(lastMsgMap[b._id].createdAt).getTime()
+              : new Date(b.updatedAt || b.createdAt).getTime();
+            return bTime - aTime;
+          });
+          setConversations(sorted);
+        } else {
+          setConversations([]);
         }
       } catch (err) {
         setConversations([]);
