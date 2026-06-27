@@ -113,6 +113,7 @@ const LeftSidebar = () => {
               src={currentUser?.profilePicture || "/default-avatar.svg"}
               alt="avatar"
               className="w-12 h-12 rounded-full border-2 border-orange-200 shadow-md object-cover"
+              onError={e => { e.target.onerror = null; e.target.src = "/default-avatar.svg"; }}
             />
             <span className="hidden md:inline text-gray-700 font-semibold text-base truncate max-w-[120px]">{currentUser?.username}</span>
           </div>

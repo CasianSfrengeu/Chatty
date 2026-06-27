@@ -72,6 +72,7 @@ const Tweet = ({ tweet, setData }) => {
           src={userData?.profilePicture || "/default-avatar.svg"}
           alt="avatar"
           className="w-10 h-10 rounded-full border-2 border-orange-200 object-cover shadow-sm"
+          onError={e => { e.target.onerror = null; e.target.src = "/default-avatar.svg"; }}
         />
         <div className="flex flex-col">
           <Link

@@ -107,6 +107,7 @@ const SharePostModal = ({ isOpen, onClose, postId, postDescription }) => {
                     src={follower.profilePicture || "/default-avatar.svg"}
                     alt="avatar"
                     className="w-10 h-10 rounded-full object-cover"
+                    onError={e => { e.target.onerror = null; e.target.src = "/default-avatar.svg"; }}
                   />
                   <div className="flex-1">
                     <p className="font-medium text-gray-800">

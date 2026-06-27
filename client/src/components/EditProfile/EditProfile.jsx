@@ -139,6 +139,7 @@ const EditProfile = ({ setOpen }) => {
                 src={currentUser?.profilePicture || "/default-avatar.svg"}
                 alt="Current Profile"
                 className="w-16 h-16 rounded-full border-2 border-orange-200 shadow-md object-cover"
+                onError={e => { e.target.onerror = null; e.target.src = "/default-avatar.svg"; }}
               />
               <div className="flex-1">
                 {imgUploadProgress > 0 ? (

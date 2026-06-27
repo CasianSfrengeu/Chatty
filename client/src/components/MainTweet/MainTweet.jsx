@@ -32,6 +32,7 @@ const MainTweet = () => {
             src={currentUser?.profilePicture || "/default-avatar.svg"}
             alt="avatar"
             className="w-12 h-12 rounded-full border-2 border-orange-200 object-cover shadow"
+            onError={e => { e.target.onerror = null; e.target.src = "/default-avatar.svg"; }}
           />
           <form className="flex-1" onSubmit={handleSubmit}>
             <textarea

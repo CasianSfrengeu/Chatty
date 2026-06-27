@@ -88,6 +88,7 @@ const FollowRequests = ({ isOpen, onClose }) => {
                       src={user.profilePicture || "/default-avatar.svg"}
                       alt={user.username}
                       className="w-10 h-10 rounded-full object-cover"
+                      onError={e => { e.target.onerror = null; e.target.src = "/default-avatar.svg"; }}
                     />
                     <div>
                       <p className="font-semibold text-gray-800">{user.username}</p>

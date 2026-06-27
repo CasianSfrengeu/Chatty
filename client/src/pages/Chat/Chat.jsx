@@ -65,6 +65,7 @@ const Chat = () => {
                 src={currentUser?.profilePicture || "/default-avatar.svg"}
                 alt="avatar"
                 className="w-12 h-12 rounded-full border-3 border-orange-200 object-cover shadow-lg"
+                onError={e => { e.target.onerror = null; e.target.src = "/default-avatar.svg"; }}
               />
               <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 border-2 border-white rounded-full"></div>
             </div>

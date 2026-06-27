@@ -159,6 +159,7 @@ const Profile = () => {
                   src={userProfile.profilePicture || "/default-avatar.svg"}
                   alt="Profile"
                   className="w-24 h-24 rounded-full border-4 border-orange-200 shadow-md object-cover"
+                  onError={e => { e.target.onerror = null; e.target.src = "/default-avatar.svg"; }}
                 />
                 <h2 className="text-2xl font-bold text-orange-500">
                   {userProfile.username}

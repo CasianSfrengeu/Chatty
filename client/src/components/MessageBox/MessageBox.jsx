@@ -225,6 +225,7 @@ const MessageBox = ({ conversation }) => {
             src={receiverProfile.profilePicture || "/default-avatar.svg"}
             alt="avatar"
             className="w-14 h-14 rounded-full object-cover border-3 border-orange-200 shadow-md group-hover/avatar:border-orange-400 transition-colors"
+            onError={e => { e.target.onerror = null; e.target.src = "/default-avatar.svg"; }}
           />
           <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 border-2 border-white rounded-full"></div>
         </Link>
