@@ -20,11 +20,14 @@ import { following } from "../../redux/userSlice";
 const Profile = () => {
   const [open, setOpen] = useState(false);
   const { currentUser } = useSelector((state) => state.user);
-  const [userTweets, setUserTweets] = useState([]); // storing user's tweets
-  const [userProfile, setUserProfile] = useState(null); // storing user profile information
+  const [userTweets, setUserTweets] = useState([]);
+  const [userProfile, setUserProfile] = useState(null);
   const [isFollowing, setIsFollowing] = useState(false);
   const [hasRequestedFollow, setHasRequestedFollow] = useState(false);
   const [isOwnProfile, setIsOwnProfile] = useState(false);
+  const [followModal, setFollowModal] = useState(null); // "following" | "followers" | null
+  const [followModalUsers, setFollowModalUsers] = useState([]);
+  const [followModalLoading, setFollowModalLoading] = useState(false);
 
   const { id } = useParams(); // extracting the user id
   const dispatch = useDispatch();
@@ -77,6 +80,21 @@ const Profile = () => {
     } catch (err) {
       console.log("error", err);
     }
+  };
+
+  // Open follow modal and fetch user details
+  const openFollowModal = async (type) => {
+    setFollowModal(type);
+    setFollowModalLoading(true);
+    setFollowModalUsers([]);
+    const ids = type === "following" ? userProfile.following : userProfile.followers;
+    try {
+      const users = await Promise.all(
+        (ids || []).map((uid) => api.get(`/users/find/${uid}`).then((r) => r.data).catch(() => null))
+      );
+      setFollowModalUsers(users.filter(Boolean));
+    } catch {}
+    setFollowModalLoading(false);
   };
 
   // Message button handler
@@ -175,14 +193,20 @@ const Profile = () => {
 
                 {/* Follow Stats */}
                 <div className="flex gap-6 text-sm text-gray-600">
-                  <span className="flex flex-col">
-                    <span className="font-semibold text-gray-800">{userProfile.following?.length || 0}</span>
+                  <button
+                    onClick={() => openFollowModal("following")}
+                    className="flex flex-col items-center hover:text-orange-500 transition-colors cursor-pointer"
+                  >
+                    <span className="font-semibold text-gray-800 text-base">{userProfile.following?.length || 0}</span>
                     <span>Following</span>
-                  </span>
-                  <span className="flex flex-col">
-                    <span className="font-semibold text-gray-800">{userProfile.followers?.length || 0}</span>
+                  </button>
+                  <button
+                    onClick={() => openFollowModal("followers")}
+                    className="flex flex-col items-center hover:text-orange-500 transition-colors cursor-pointer"
+                  >
+                    <span className="font-semibold text-gray-800 text-base">{userProfile.followers?.length || 0}</span>
                     <span>Followers</span>
-                  </span>
+                  </button>
                 </div>
 
                 {/* Follow & Edit Profile Button */}
@@ -227,6 +251,64 @@ const Profile = () => {
 
       {/* Edit Profile Modal */}
       {open && <EditProfile setOpen={setOpen} />}
+
+      {/* Following / Followers Modal */}
+      {followModal && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm"
+          onClick={() => setFollowModal(null)}
+        >
+          <div
+            className="bg-white rounded-2xl shadow-2xl w-full max-w-sm mx-4 overflow-hidden"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Modal Header */}
+            <div className="flex items-center justify-between px-6 py-4 border-b border-orange-100">
+              <h3 className="text-lg font-bold text-gray-800 capitalize">{followModal}</h3>
+              <button
+                onClick={() => setFollowModal(null)}
+                className="text-gray-400 hover:text-gray-600 text-2xl leading-none"
+              >
+                &times;
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div className="max-h-96 overflow-y-auto divide-y divide-orange-50">
+              {followModalLoading ? (
+                <div className="flex justify-center items-center py-10 text-orange-400 font-medium">
+                  Loading...
+                </div>
+              ) : followModalUsers.length === 0 ? (
+                <div className="flex justify-center items-center py-10 text-gray-400">
+                  No users yet.
+                </div>
+              ) : (
+                followModalUsers.map((user) => (
+                  <button
+                    key={user._id}
+                    onClick={() => { setFollowModal(null); navigate(`/profile/${user._id}`); }}
+                    className="w-full flex items-center gap-4 px-6 py-4 hover:bg-orange-50 transition-colors text-left"
+                  >
+                    <img
+                      src={user.profilePicture || "/default-avatar.svg"}
+                      alt={user.username}
+                      className="w-11 h-11 rounded-full object-cover border-2 border-orange-100 shrink-0"
+                      onError={e => { e.target.onerror = null; e.target.src = "/default-avatar.svg"; }}
+                    />
+                    <div className="flex flex-col min-w-0">
+                      <span className="font-semibold text-gray-800 truncate">{user.username}</span>
+                      {user.biography && (
+                        <span className="text-sm text-gray-500 truncate">{user.biography}</span>
+                      )}
+                    </div>
+                  </button>
+                ))
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 };
