@@ -24,7 +24,12 @@ const Navbar = ({ onSearch }) => {
   return (
     <div className="w-full h-[60px] fixed top-0 left-0 bg-white shadow-md flex items-center justify-between px-6 z-50">
       {/* App Name */}
-      <h1 className="text-2xl font-extrabold text-orange-500">Chatty</h1>
+      <h1
+        className="text-2xl font-extrabold text-orange-500 cursor-pointer hover:text-orange-600 transition-colors select-none"
+        onClick={() => navigate("/")}
+      >
+        Chatty
+      </h1>
 
       {/* Search Bar */}
       <form onSubmit={handleSearch} className="relative w-[250px] md:w-[300px]">
