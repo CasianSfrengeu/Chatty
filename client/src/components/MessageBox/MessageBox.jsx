@@ -220,18 +220,21 @@ const MessageBox = ({ conversation }) => {
     <div className="flex flex-col h-full bg-gradient-to-br from-white to-orange-50/30 rounded-2xl shadow-xl overflow-hidden">
       {/* Header */}
       <div className="sticky top-0 z-10 flex items-center gap-4 px-6 py-5 bg-white/90 backdrop-blur-sm border-b border-orange-100/50 shadow-sm">
-        <div className="relative">
+        <Link to={`/profile/${otherUserId}`} className="relative shrink-0 group/avatar">
           <img
             src={receiverProfile.profilePicture || "/default-avatar.png"}
             alt="avatar"
-            className="w-14 h-14 rounded-full object-cover border-3 border-orange-200 shadow-md"
+            className="w-14 h-14 rounded-full object-cover border-3 border-orange-200 shadow-md group-hover/avatar:border-orange-400 transition-colors"
           />
           <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 border-2 border-white rounded-full"></div>
-        </div>
+        </Link>
         <div className="flex flex-col flex-1 min-w-0">
-          <span className="font-semibold text-lg text-gray-800 truncate">
+          <Link
+            to={`/profile/${otherUserId}`}
+            className="font-semibold text-lg text-gray-800 truncate hover:text-orange-500 transition-colors w-fit"
+          >
             {receiverUsername}
-          </span>
+          </Link>
           <span className="text-sm text-gray-500 truncate">
             {receiverProfile.biography || "Active now"}
           </span>
