@@ -164,7 +164,7 @@ export const respondToFollowRequest = async (req, res, next) => {
 };
 
 export const deleteUser = async (req, res, next) => {
-  if (req.params.id !== req.user.id) {
+  if (String(req.params.id) !== String(req.user.id)) {
     return next(handleError(403, "You can only delete your own account"));
   }
   try {
