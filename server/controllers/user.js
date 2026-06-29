@@ -8,10 +8,11 @@ This controller handles user functions such as:
 
 */
 
-// importing User and Tweet, to fetch the user data and remove a user's tweets when the user is deleted
 import { handleError } from "../error.js";
 import User from "../models/User.js";
 import Tweet from "../models/Tweet.js";
+import Message from "../models/Message.js";
+import Conversation from "../models/Conversation.js";
 
 
 export const getUser = async (req, res, next) => {
@@ -163,21 +164,38 @@ export const respondToFollowRequest = async (req, res, next) => {
 };
 
 export const deleteUser = async (req, res, next) => {
-  // checking if the user is authorized
-  if (req.params.id === req.user.id) {
-    try {
-      // finding the user by id and deleting all of their tweets
-      await User.findByIdAndDelete(req.params.id);
-      await Tweet.remove({ userId: req.params.id });
+  if (req.params.id !== req.user.id) {
+    return next(handleError(403, "You can only delete your own account"));
+  }
+  try {
+    const userId = req.params.id;
 
-      // we return a message if the actions succeeds
-      res.status(200).json("User delete");
-    // error handling
-    } catch (err) {
-      next(err);
+    // Delete all tweets by the user
+    await Tweet.deleteMany({ userId });
+
+    // Delete all messages sent by the user
+    await Message.deleteMany({ sender: userId });
+
+    // Delete all conversations the user is part of (and their messages)
+    const conversations = await Conversation.find({ members: userId });
+    const convIds = conversations.map((c) => c._id);
+    if (convIds.length > 0) {
+      await Message.deleteMany({ conversationId: { $in: convIds } });
+      await Conversation.deleteMany({ _id: { $in: convIds } });
     }
-  } else {
-    return next(handleError(403, "You can only update your own account"));
+
+    // Remove user from other users' followers/following arrays
+    await User.updateMany(
+      { $or: [{ followers: userId }, { following: userId }, { pendingFollowers: userId }] },
+      { $pull: { followers: userId, following: userId, pendingFollowers: userId } }
+    );
+
+    // Finally delete the user
+    await User.findByIdAndDelete(userId);
+
+    res.status(200).json("Account deleted successfully");
+  } catch (err) {
+    next(err);
   }
 };
 

@@ -1,61 +1,83 @@
 import React, { useState, useEffect } from "react";
 import api from "../../api";
 
+const FEATURED_CATEGORIES = [
+  { tag: "film", emoji: "🎬" },
+  { tag: "music", emoji: "🎵" },
+  { tag: "news", emoji: "📰" },
+  { tag: "sport", emoji: "⚽" },
+  { tag: "tech", emoji: "💻" },
+  { tag: "gaming", emoji: "🎮" },
+  { tag: "travel", emoji: "✈️" },
+  { tag: "food", emoji: "🍕" },
+];
+
 const RightSidebar = ({ onHashtagClick }) => {
   const [trendingHashtags, setTrendingHashtags] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     const fetchTrendingHashtags = async () => {
       try {
-        setIsLoading(true);
         const response = await api.get("/tweets/trending-hashtags");
         setTrendingHashtags(Array.isArray(response.data) ? response.data : []);
-      } catch (err) {
+      } catch {
         setTrendingHashtags([]);
-      } finally {
-        setIsLoading(false);
       }
     };
     fetchTrendingHashtags();
   }, []);
 
   const handleHashtagClick = (hashtag) => {
-    if (onHashtagClick) {
-      onHashtagClick(hashtag);
-    }
+    if (onHashtagClick) onHashtagClick(hashtag);
   };
 
+  // Filter out any featured categories from the trending list to avoid duplicates
+  const featuredTags = new Set(FEATURED_CATEGORIES.map((c) => c.tag));
+  const extraTrending = trendingHashtags.filter((h) => !featuredTags.has(h._id));
+
   return (
-    <div className="p-6 bg-orange-50 border border-orange-300 rounded-lg shadow-md mx-4 space-y-4">
-      {/* Trending Title */}
-      <h2 className="text-xl font-bold text-orange-500">Trending</h2>
-      {/* Trending Topics */}
-      <div className="space-y-3">
-        {isLoading ? (
-          <div className="text-center py-4">
-            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-orange-500 mx-auto"></div>
-            <p className="text-gray-600 text-sm mt-2">Loading trends...</p>
-          </div>
-        ) : trendingHashtags.length === 0 ? (
-          <div className="text-gray-400 text-center">No trending hashtags yet.</div>
-        ) : (
-          trendingHashtags.map((hashtag) => (
-            <div
-              key={hashtag._id}
-              onClick={() => handleHashtagClick(hashtag._id)}
-              className="flex items-center justify-between p-2 rounded-lg hover:bg-orange-100 cursor-pointer transition group"
+    <div className="p-6 bg-orange-50 border border-orange-300 rounded-lg shadow-md mx-4 space-y-5">
+      {/* Categories */}
+      <div>
+        <h2 className="text-xl font-bold text-orange-500 mb-3">Categories</h2>
+        <div className="space-y-1">
+          {FEATURED_CATEGORIES.map(({ tag, emoji }) => (
+            <button
+              key={tag}
+              onClick={() => handleHashtagClick(tag)}
+              className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-orange-100 transition group text-left"
             >
-              <p className="font-semibold text-gray-700 group-hover:text-orange-600 transition">
-                #{hashtag._id}
-              </p>
-              <span className="text-xs text-gray-500 bg-white px-2 py-1 rounded-full">
-                {hashtag.count} posts
+              <span className="text-lg">{emoji}</span>
+              <span className="font-semibold text-gray-700 group-hover:text-orange-600 transition">
+                #{tag}
               </span>
-            </div>
-          ))
-        )}
+            </button>
+          ))}
+        </div>
       </div>
+
+      {/* Trending hashtags from users (only if any beyond the fixed ones) */}
+      {extraTrending.length > 0 && (
+        <div>
+          <h2 className="text-xl font-bold text-orange-500 mb-3">Trending</h2>
+          <div className="space-y-1">
+            {extraTrending.slice(0, 5).map((hashtag) => (
+              <button
+                key={hashtag._id}
+                onClick={() => handleHashtagClick(hashtag._id)}
+                className="w-full flex items-center justify-between px-3 py-2 rounded-lg hover:bg-orange-100 cursor-pointer transition group text-left"
+              >
+                <span className="font-semibold text-gray-700 group-hover:text-orange-600 transition">
+                  #{hashtag._id}
+                </span>
+                <span className="text-xs text-gray-500 bg-white px-2 py-1 rounded-full">
+                  {hashtag.count} posts
+                </span>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 };
