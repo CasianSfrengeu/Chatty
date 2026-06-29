@@ -2,7 +2,7 @@ import Comment from "../models/Comment.js";
 import User from "../models/User.js";
 import { handleError } from "../error.js";
 
-// 🔸 POST /api/comments
+//  POST /api/comments
 export const createComment = async (req, res, next) => {
   try {
     const newComment = new Comment(req.body);
@@ -13,7 +13,7 @@ export const createComment = async (req, res, next) => {
   }
 };
 
-// 🔸 GET /api/comments/:postId
+//  GET /api/comments/:postId
 export const getCommentsByPost = async (req, res, next) => {
   try {
     const comments = await Comment.find({ postId: req.params.postId }).sort({
@@ -37,7 +37,7 @@ export const getCommentsByPost = async (req, res, next) => {
   }
 };
 
-// 🔸 PUT /api/comments/:id/like
+//  PUT /api/comments/:id/like
 export const likeComment = async (req, res, next) => {
   try {
     const comment = await Comment.findById(req.params.id);

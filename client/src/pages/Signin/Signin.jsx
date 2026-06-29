@@ -47,7 +47,7 @@ const Signin = () => {
     }
   };
 
-  // ✅ Signup
+  //Signup
   const handleSignup = async (e) => {
     e.preventDefault();
     setSignupError("");

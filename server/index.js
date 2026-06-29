@@ -31,7 +31,7 @@ const connect = () => {
   mongoose
     .connect(process.env.MONGO)
     .then(() => {
-      console.log("✅ Connected to MongoDB database");
+      console.log("Connected to MongoDB database");
     })
     .catch((err) => {
       throw err;
@@ -101,7 +101,7 @@ io.on("connection", (socket) => {
   // Când un user se conectează
   socket.on("addUser", (userId) => {
     users.set(userId, socket.id);
-    console.log("🟢 User online:", userId);
+    console.log("User online:", userId);
   });
 
   // Trimitere mesaj între useri
@@ -125,7 +125,7 @@ io.on("connection", (socket) => {
     for (const [userId, socketId] of users.entries()) {
       if (socketId === socket.id) {
         users.delete(userId);
-        console.log("❌ User offline:", userId);
+        console.log("User offline:", userId);
         break;
       }
     }
@@ -140,8 +140,8 @@ io.on("connection", (socket) => {
 //
 // Servire fișiere statice din React în producție
 if (process.env.NODE_ENV === "production") {
-  console.log("🔧 Production mode: serving static files from client/build");
-  console.log("🔧 Current directory:", __dirname);
+  console.log("Production mode: serving static files from client/build");
+  console.log("Current directory:", __dirname);
   
   // Try multiple possible paths for the client build
   const possiblePaths = [
@@ -155,7 +155,7 @@ if (process.env.NODE_ENV === "production") {
   for (const testPath of possiblePaths) {
     if (fs.existsSync(testPath)) {
       clientBuildPath = testPath;
-      console.log("✅ Found client build at:", clientBuildPath);
+      console.log("Found client build at:", clientBuildPath);
       break;
     }
   }
@@ -173,7 +173,7 @@ if (process.env.NODE_ENV === "production") {
       res.sendFile(path.join(clientBuildPath, "index.html"));
     });
   } else {
-    console.log("❌ Could not find client build directory. Tried paths:", possiblePaths);
+    console.log("Could not find client build directory. Tried paths:", possiblePaths);
   }
 }
 
@@ -181,5 +181,5 @@ if (process.env.NODE_ENV === "production") {
 const port = process.env.PORT || 8000;
 server.listen(port, () => {
   connect();
-  console.log(`🚀 Server running on port ${port}`);
+  console.log(`Server running on port ${port}`);
 });

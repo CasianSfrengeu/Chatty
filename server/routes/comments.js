@@ -5,7 +5,7 @@ import { verifyToken } from "../verifyToken.js";
 
 const router = express.Router();
 
-// ✅ Adaugă un comentariu nou
+// Adaugă un comentariu nou
 router.post("/", verifyToken, async (req, res) => {
   const newComment = new Comment({
     postId: req.body.postId,
@@ -22,7 +22,7 @@ router.post("/", verifyToken, async (req, res) => {
   }
 });
 
-// ✅ Obține toate comentariile pentru un post
+// Obține toate comentariile pentru un post
 router.get("/:postId", async (req, res) => {
   try {
     const comments = await Comment.find({ postId: req.params.postId }).sort({ createdAt: 1 });
@@ -32,7 +32,7 @@ router.get("/:postId", async (req, res) => {
   }
 });
 
-// ✅ Șterge un comentariu
+// Șterge un comentariu
 router.delete("/:id", verifyToken, async (req, res) => {
   try {
     const comment = await Comment.findById(req.params.id);
@@ -49,7 +49,7 @@ router.delete("/:id", verifyToken, async (req, res) => {
   }
 });
 
-// ✅ Like / Unlike pe un comentariu
+// Like / Unlike pe un comentariu
 router.put("/:id/like", verifyToken, async (req, res) => {
   try {
     const comment = await Comment.findById(req.params.id);

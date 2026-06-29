@@ -17,7 +17,7 @@ export const signup = async (req, res, next) => {
 
     const { password, ...othersData } = newUser._doc;
 
-    // ✅ Trimitem tokenul și în JSON, nu doar în cookie
+    // Trimitem tokenul și în JSON, nu doar în cookie
     res
       .cookie("access_token", token, { httpOnly: true })
       .status(200)
@@ -42,7 +42,7 @@ export const signin = async (req, res, next) => {
 
     const { password, ...othersData } = user._doc;
 
-    // ✅ Trimitem tokenul și în JSON, nu doar în cookie
+    // Trimitem tokenul și în JSON, nu doar în cookie
     res
       .cookie("access_token", token, { httpOnly: true })
       .status(200)

@@ -101,7 +101,7 @@ export const requestFollow = async (req, res, next) => {
 // New function to handle follow request responses
 export const respondToFollowRequest = async (req, res, next) => {
   try {
-    console.log("🔍 respondToFollowRequest called with:", {
+    console.log(" respondToFollowRequest called with:", {
       params: req.params,
       body: req.body,
       user: req.user
@@ -111,7 +111,7 @@ export const respondToFollowRequest = async (req, res, next) => {
     const currentUser = await User.findById(req.params.id);
     const requestingUser = await User.findById(req.body.requestingUserId);
 
-    console.log("🔍 Found users:", {
+    console.log(" Found users:", {
       currentUser: currentUser ? { id: currentUser._id, pendingFollowers: currentUser.pendingFollowers } : null,
       requestingUser: requestingUser ? { id: requestingUser._id } : null
     });
@@ -132,11 +132,11 @@ export const respondToFollowRequest = async (req, res, next) => {
 
     // Check if the requesting user is in the current user's pending followers
     if (!currentUser.pendingFollowers.includes(req.body.requestingUserId)) {
-      console.log("❌ No pending follow request found. Current pendingFollowers:", currentUser.pendingFollowers);
+      console.log("No pending follow request found. Current pendingFollowers:", currentUser.pendingFollowers);
       return res.status(404).json("No pending follow request found");
     }
 
-    console.log("✅ Found pending follow request, processing...");
+    console.log("Found pending follow request, processing...");
 
     // Remove from pending followers
     await currentUser.updateOne({
@@ -151,14 +151,14 @@ export const respondToFollowRequest = async (req, res, next) => {
       await requestingUser.updateOne({
         $push: { following: req.params.id },
       });
-      console.log("✅ Follow request accepted");
+      console.log("Follow request accepted");
       res.status(200).json("Follow request accepted");
     } else {
-      console.log("✅ Follow request rejected");
+      console.log("Follow request rejected");
       res.status(200).json("Follow request rejected");
     }
   } catch (err) {
-    console.error("❌ Error in respondToFollowRequest:", err);
+    console.error("Error in respondToFollowRequest:", err);
     next(err);
   }
 };
